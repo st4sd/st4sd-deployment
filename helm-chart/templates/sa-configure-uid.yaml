@@ -1,0 +1,10 @@
+{{ if .Values.installWorkflowOperator }}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    st4sd.ibm.com/component: configure-uid
+  name: {{ .Values.serviceAccountWithSCC }}
+
+{{ end }}

@@ -1,0 +1,16 @@
+{{ if .Values.installRegistryUI }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    st4sd.ibm.com/component: registry-ui
+  name: st4sd-registry-ui
+
+spec:
+  selector:
+    app: st4sd-registry-ui
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+{{ end }}

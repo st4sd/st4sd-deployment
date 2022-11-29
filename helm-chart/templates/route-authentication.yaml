@@ -1,0 +1,21 @@
+{{ if .Values.installAuthentication }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: st4sd-authentication
+    st4sd.ibm.com/component: authentication
+  name: st4sd-authentication
+spec:
+  host: {{ include "host.workflowStack" . }}
+  port:
+    targetPort: oauth
+  to:
+    kind: Service
+    name: st4sd-authentication
+    weight: 100
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: reencrypt
+  wildcardPolicy: None
+{{ end }}

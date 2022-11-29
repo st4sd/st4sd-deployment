@@ -1,0 +1,59 @@
+{{ if .Values.installRBACClusterScoped }}
+
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: {{ .Values.allowPrivilegeEscalation }}
+allowPrivilegedContainer: {{ .Values.allowPrivilegedContainer}}
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: []
+groups: []
+kind: SecurityContextConstraints
+metadata:
+  # VV: Do not modify this object - helm may override your changes on an update.
+  # Create a new SecurityContextConstraints object instead.
+  annotations:
+    st4sd.ibm.com/warning: do-not-edit-this-object-create-new-role-binding
+  labels:
+    st4sd.ibm.com/component: rbac-cluster-scoped
+  name: st4sd-workflow-operator-scc-{{ .Release.Namespace }}-do-not-modify
+priority: 10
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+- MKNOD
+- CHOWN
+- DAC_OVERRIDE
+- FSETID
+- FOWNER
+- SETGID
+- SETUID
+- SETPCAP
+- NET_BIND_SERVICE
+- KILL
+fsGroup:
+  type: MustRunAs
+  ranges:
+    - min: {{ int64 .Values.namespaceContainersFsGroupRangeMin }}
+      max: {{ int64 .Values.namespaceContainersFsGroupRangeMax }}
+runAsUser:
+  type: MustRunAsRange
+  uidRangeMin: {{ int64 .Values.namespaceContainersUidRangeMin }}
+  uidRangeMax: {{ int64 .Values.namespaceContainersUidRangeMax }}
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+users:
+- system:serviceaccount:{{ .Release.Namespace }}:{{ .Values.serviceAccountWorkflowOperator }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ .Values.serviceAccountWithSCC }}
+
+{{ end }}

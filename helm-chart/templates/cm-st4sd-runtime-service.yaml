@@ -1,0 +1,37 @@
+{{ if .Values.installRuntimeServiceConfigMap }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    workflowConfig: parametrization
+    st4sd.ibm.com/component: runtime-service
+  name: {{ .Values.runtimeServiceConfigConfigMapName }}
+data:
+  datastoreLabelGateway:  "{{ .Values.datastoreLabelGateway }}"
+  hostDatastoreGateway: "{{ include "host.workflowStack" . }}/ds-gateway"
+  hostDatastoreRegistry: "{{ include "host.workflowStack" . }}/ds-registry"
+  hostDatastoreRest: "{{ include "host.workflowStack" . }}/ds-mongodb-proxy"
+  hostRuntimeService: "{{ include "host.workflowStack" . }}/rs"
+  hostST4SD: "{{ include "host.workflowStack" . }}"
+
+  # VV: st4sdRuntimeService.imagePullSecrets (in _helpers.tpl) concatenates those already defined in the
+  # ConfigMap on the server to those defined by the helm chart. If you are using DEBUG=yes what you see below
+  # does not include what's on the server. Helm will not contact the server when not actually deploying.
+  config.json: |-
+    {
+    {{- if .Values.installGithubSecretOAuth  }}
+      "gitsecret-oauth": "{{ .Values.gitOAuthSecretName }}",
+    {{- end }}
+    {{- if .Values.defaultOrchestratorArguments }}
+      "default-arguments": {{ .Values.defaultOrchestratorArguments | toJson }},
+    {{- end }}
+      "workflow-monitoring-image": "{{ .Values.imagesRuntimeMonitoring }}{{ .Values.imagesVariant }}",
+      "image": "{{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}",
+      "imagePullSecrets": [{{- include "st4sdRuntimeService.imagePullSecrets" . }}],
+      "workingVolume": "{{ .Values.pvcForWorkflowInstances }}",
+      "inputdatadir": "./examples",
+      "s3-fetch-files-image": "{{ .Values.imagesRuntimeS3Fetch }}{{ .Values.imagesVariant }}"
+    }
+
+{{ end }}

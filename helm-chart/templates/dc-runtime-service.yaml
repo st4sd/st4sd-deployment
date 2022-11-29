@@ -1,0 +1,96 @@
+{{ if .Values.installRuntimeService }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    name: st4sd-runtime-service
+    st4sd.ibm.com/component: runtime-service
+  name: st4sd-runtime-service
+spec:
+  replicas: 1
+  selector:
+    app: st4sd-runtime-service
+    st4sd.ibm.com/component: runtime-service
+  template:
+    metadata:
+      labels:
+        app: st4sd-runtime-service
+        st4sd.ibm.com/component: runtime-service
+    spec:
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: runtime-service
+        env:
+        - name: FLASK_URL_PREFIX
+          # VV: The flask app serves requests whose HTTP PATH starts with /rs
+          value: /rs
+        - name: CONFIGMAP_NAME
+          value: {{ .Values.runtimeServiceConfigConfigMapName }}
+        - name: MONITORED_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        # VV: Uses in-cluster DNS resolution for services - below is the name of the nexus service
+        # and the port number is the service-port endpoint for the "mongodb-proxy" port
+        - name: DATASTORE_MONGODB_PROXY_ENDPOINT
+          value: "http://st4sd-datastore-nexus:5000/ds-mongodb-proxy"
+        # VV: Uses in-cluster DNS resolution for services - below is the name of the nexus service
+        # and the port number is the service-port endpoint for the "gateway-registry" port
+        - name: DATASTORE_GATEWAY_REGISTRY
+          value: "http://st4sd-datastore-nexus:5001/ds-registry"
+        ports:
+          - name: runtime-service
+            containerPort: 4000
+            protocol: TCP
+        
+        image: {{ .Values.imagesRuntimeService }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+
+        resources: {{ toYaml .Values.resources.runtimeService | nindent 10}}
+
+        volumeMounts:
+        # VV: working-volume is the same Volume that workflow instances use to store their outputs
+        - mountPath: /tmp/workdir
+          name: working-volume
+        - mountPath: /examples
+          name: experiments-pvc
+        - mountPath: /logs
+          name: experiments-pvc
+        - mountPath: /shared
+          name: shared
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: {{ .Values.serviceAccountWorkflowOperator }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: shared
+        emptyDir: {}
+      - name: experiments-pvc
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvcForRuntimeServiceMetadata }}
+      - name: working-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvcForWorkflowInstances }}
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - runtime-service
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagRuntimeService }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+{{ end }}

@@ -1,0 +1,121 @@
+{{ if .Values.installDatastore }}
+
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    st4sd.ibm.com/component: datastore
+  name: st4sd-datastore-cloud-instance
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: st4sd-datastore-cloud-instance
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: st4sd-datastore-cloud-instance
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountWithSCC }}
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: reporter
+        command:
+        - /scripts/reporter.sh
+        env:
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: {{ .Values.datastoreMongoDBSecretName }}
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: {{ .Values.datastoreMongoDBSecretName }}
+        - name: MONGODB_AUTHSOURCE
+          value: admin
+        - name: URL_GATEWAY_REGISTRY
+          # VV: Uses in-cluster DNS resolution for services - below is the name of the nexus service
+          # and the port number is the service-port endpoint for the "gateway-registry" port
+          value: 'http://st4sd-datastore-nexus:5001/ds-registry'
+        - name: URL_LOCAL_LOCAL
+          # VV: This is the URL that the reporter uses to contact the local gateway it spawns
+          value: 'http://127.0.0.1:5002/ds-gateway'
+        - name: URL_LOCAL_PUBLIC
+          value: https://{{ include "host.workflowStack" . }}/ds-gateway
+        - name: LOCAL_GATEWAY_ID
+          value: {{ .Values.datastoreLabelGateway }}
+        image: {{ .Values.imagesDatastore }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        resources: {{ toYaml .Values.resources.datastoreInstanceReporter | nindent 10}}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tmp/workdir
+          name: working-volume
+
+      - name: gateway
+        command:
+          - /scripts/cluster_gateway.sh
+        env:
+          - name: FLASK_URL_PREFIX
+            # VV: The flask app serves requests whose HTTP PATH starts with /ds-gateway
+            value: /ds-gateway
+          - name: EXTERNAL_PORT
+            value: "5002"
+          - name: DS_FILE_MAX_SIZE
+            value: {{ int64 .Values.datastoreFileMaxSize | quote }}
+        image: {{ .Values.imagesDatastore }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        resources: {{ toYaml .Values.resources.datastoreInstanceGateway | nindent 10 }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - mountPath: /tmp/workdir
+            name: working-volume
+          - mountPath: /shared
+            name: shared
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 31
+      volumes:
+      - name: working-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvcForWorkflowInstances }}
+      - name: shared
+        emptyDir: {}
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - reporter
+      - gateway
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagDatastore }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+
+{{ end }}

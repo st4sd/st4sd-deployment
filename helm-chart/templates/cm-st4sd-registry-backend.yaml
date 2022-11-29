@@ -1,0 +1,11 @@
+{{ if .Values.installRegistryBackendConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.registryBackendConfigConfigMapName }}
+  labels:
+    app: st4sd-registry-backend
+    st4sd.ibm.com/component: registry-backend
+data:
+  ST4SD_REGISTRY_UI_SETTINGS_IS_GLOBAL: {{ if .Values.isGlobalRegistry }}"yes"{{ else }}"no"{{ end }}
+{{ end }}

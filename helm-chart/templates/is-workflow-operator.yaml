@@ -1,0 +1,23 @@
+{{ if and .Values.imagesVariant .Values.installRuntimeService }}
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: st4sd-workflow-operator
+    st4sd.ibm.com/component: workflow-operator
+  name: {{ .Values.imageStreamTagRuntimeOperator }}
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - from:
+      kind: DockerImage
+      name: {{ .Values.imagesRuntimeOperator }}{{ .Values.imagesVariant }}
+    importPolicy: {}
+    name: {{ .Values.imagesVariant }}
+    reference: true
+    referencePolicy:
+      type: Source
+
+{{ end }}

@@ -1,0 +1,79 @@
+{{ if .Values.installRBACNamespaced }}
+
+apiVersion: authorization.openshift.io/v1
+kind: Role
+metadata:
+  name: workflow-user
+  labels:
+    st4sd.ibm.com/component: rbac-namespaced
+rules:
+
+- apiGroups:
+  - ""
+  resources:
+    # VV: we can optionally check whether users have access to services living in this
+    # namespace before we let them access the st4sd microservices
+    - services
+  verbs: ["get", "list", "watch"]
+
+# VV: Workflow users may need to work with Job objects because flow creates 1 Job per component Task
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  - deletecollection
+
+- apiGroups:
+  - batch
+  resources:
+  - jobs/status
+  verbs:
+  - get
+  - list
+  - watch
+
+ # VV: Workflow users may interact with pods (e.g. oc debug, oc exec etc)
+- apiGroups:
+  - ""
+  resources:
+    - pods
+    # VV: we can optionally check whether users have access to services living in this
+    # namespace before we let them access the st4sd microservices
+    - services
+    # VV: We don't need these ones below for deploying but having them around makes it that
+    # much easier to troubleshoot the workflow stack
+    - pods/attach
+    - pods/exec
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+- apiGroups:
+  - ""
+  resources:
+    - pods/log
+  verbs: ["get", "list", "watch"]
+
+# VV: Users may end up creating/managing Workflow and Dataset objects
+- apiGroups:
+  # VV: This is the old ApiGroup it's deprecated and will be removed
+  - hpsys.ie.ibm.com
+  - st4sd.ibm.com
+  - com.ie.ibm.hpsys
+  resources:
+  - '*'
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
+  - patch
+
+{{ end }}

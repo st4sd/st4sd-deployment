@@ -1,0 +1,10 @@
+{{ if .Values.installDeployer }}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    st4sd.ibm.com/component: st4sd-stack-deploy
+  name: {{ .Values.serviceAccountDeployNamespacedObjects }}
+
+{{ end }}

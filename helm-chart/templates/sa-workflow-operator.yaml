@@ -1,0 +1,16 @@
+{{ if .Values.installWorkflowOperator }}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    serviceaccounts.openshift.io/oauth-redirectreference.workflow-stack: |
+      {
+        "kind":"OAuthRedirectReference","apiVersion":"v1",
+        "reference":{"kind":"Route","name":"st4sd-authentication"}
+      }
+  labels:
+    st4sd.ibm.com/component: route
+  name: {{ .Values.serviceAccountWorkflowOperator }}
+
+{{ end }}

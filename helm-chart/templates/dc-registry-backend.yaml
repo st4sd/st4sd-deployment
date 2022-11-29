@@ -1,0 +1,69 @@
+{{ if .Values.installRegistryBackend }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    name: st4sd-registry-backend
+    st4sd.ibm.com/component: registry-backend
+  name: st4sd-registry-backend
+spec:
+  replicas: 1
+  selector:
+    app: st4sd-registry-backend
+    st4sd.ibm.com/component: registry-backend
+  template:
+    metadata:
+      labels:
+        app: st4sd-registry-backend
+        st4sd.ibm.com/component: registry-backend
+    spec:
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: registry-backend
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.registryBackendConfigConfigMapName }}
+        ports:
+          - containerPort: 8085
+                    
+        image: {{ .Values.imagesRegistryBackend }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+
+        resources: {{ toYaml .Values.resources.registryBackend | nindent 10}}
+
+        volumeMounts:
+          - mountPath: /var/run/secrets/tokens
+            name: tokens-vault
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: {{ .Values.serviceAccountWorkflowOperator }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: tokens-vault
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: rs-token
+                  expirationSeconds: 86400
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - registry-backend
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagRegistryBackend }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+{{ end }}

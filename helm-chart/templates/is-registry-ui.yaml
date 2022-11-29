@@ -1,0 +1,23 @@
+{{ if and .Values.imagesVariant .Values.installRegistryUI }}
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: st4sd-registry-ui
+    st4sd.ibm.com/component: registry-ui
+  name: {{ .Values.imageStreamTagRegistryUI }}
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - from:
+      kind: DockerImage
+      name: {{ .Values.imagesRegistryUI }}{{ .Values.imagesVariant }}
+    importPolicy: {}
+    name: {{ .Values.imagesVariant }}
+    reference: true
+    referencePolicy:
+      type: Source
+
+{{ end }}

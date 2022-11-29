@@ -1,0 +1,109 @@
+{{ if .Values.installWorkflowOperator }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    name: st4sd-runtime-k8s
+    st4sd.ibm.com/component: workflow-operator
+  name: st4sd-runtime-k8s
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    name: st4sd-runtime-k8s
+    st4sd.ibm.com/component: workflow-operator
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        name: st4sd-runtime-k8s
+        st4sd.ibm.com/component: workflow-operator
+    spec:
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - command:
+        - /manager
+        args:
+        - --leader-elect
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: SERVICE_ACCOUNT_NAME
+          value: {{ .Values.serviceAccountWorkflowOperator }}
+        - name: CONFIGMAP_NAME
+          value: {{ .Values.runtimeServiceConfigConfigMapName }}
+        # git-sync is an external image (https://github.com/kubernetes/git-sync) - it does not need an `imagesVariant`
+        - name: GIT_SYNC_IMAGE
+          value: {{ .Values.imagesRuntimeGitSync }}
+        - name: WORKFLOW_MONITORING_IMAGE
+          value: {{ .Values.imagesRuntimeMonitoring }}{{ .Values.imagesVariant }}
+        - name: S3_FETCH_FILES_IMAGE
+          value: {{ .Values.imagesRuntimeS3Fetch }}{{ .Values.imagesVariant }}
+        - name: USER_ID
+          value: {{ int64 .Values.workflowContainersUid | quote }}
+        - name: GROUP_ID
+          value: {{ int64 .Values.workflowContainersGroupId | quote }}
+        - name: FSGROUP
+          value: "5000"
+        image: {{ .Values.imagesRuntimeOperator }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        name: workflow-operator
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources: {{ toYaml .Values.resources.runtimeK8s | nindent 10 }}
+
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: {{ .Values.serviceAccountWorkflowOperator }}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - workflow-operator
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagRuntimeOperator }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+{{ end }}

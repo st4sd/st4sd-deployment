@@ -1,0 +1,17 @@
+{{ if .Values.installRBACNamespaced }}
+
+apiVersion: authorization.openshift.io/v1
+kind: Role
+metadata:
+  name: st4sd-authenticate-microservices
+  labels:
+    st4sd.ibm.com/component: rbac-namespaced
+rules:
+
+- apiGroups:
+  - ""
+  resources:
+    - services
+  verbs: ["get", "list", "watch"]
+
+{{ end }}

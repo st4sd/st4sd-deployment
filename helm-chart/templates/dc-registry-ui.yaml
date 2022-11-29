@@ -1,0 +1,66 @@
+{{ if .Values.installRegistryUI }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    name: st4sd-registry-ui
+    st4sd.ibm.com/component: registry-ui
+  name: st4sd-registry-ui
+spec:
+  replicas: 1
+  selector:
+    app: st4sd-registry-ui
+    st4sd.ibm.com/component: registry-ui
+  template:
+    metadata:
+      labels:
+        app: st4sd-registry-ui
+        st4sd.ibm.com/component: registry-ui
+    spec:
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: registry-ui
+        ports:
+          - containerPort: 8080
+                    
+        image: {{ .Values.imagesRegistryUI }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+
+        resources: {{ toYaml .Values.resources.registryUI | nindent 10}}
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: {{ .Values.serviceAccountWorkflowOperator }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Values.registryUINginxConfigConfigMapName }}
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - registry-ui
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagRegistryUI }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+{{ end }}

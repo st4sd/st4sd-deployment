@@ -1,0 +1,138 @@
+{{ if .Values.installRBACNamespaced }}
+
+apiVersion: authorization.openshift.io/v1
+kind: Role
+metadata:
+  labels:
+    st4sd.ibm.com/component: rbac-namespaced
+  name: st4sd-stack-deploy
+rules:
+
+# VV: Permission to read current namespace and object
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+
+- apiGroups:
+  - ""
+  - project.openshift.io
+  resources:
+  - projects
+  verbs:
+  - get
+# VV: Permissions required to deploy helm updates
+- apiGroups:
+    - rbac.authorization.k8s.io
+    - authorization.openshift.io
+  resources:
+    - roles
+    - rolebindings
+  verbs:  ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+# VV: Like above, but for persistentvolumeclaims instead
+- apiGroups:
+    - ""
+  verbs: ["list", "watch", "get"]
+  resources: 
+    - persistentvolumeclaims
+
+# VV: We use deploymentConfigs for the various parts of the stack
+- apiGroups:
+    - apps.openshift.io
+  resources:
+    - deploymentconfigs
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+# VV: DeploymentConfigs also calls for the ability to create imagestreams, and run "oc import-image"
+- apiGroups:
+    - image.openshift.io
+  resources:
+    - imagestreams
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+- apiGroups:
+    - image.openshift.io
+  resources:
+    - imagestreamimports
+  verbs: ["create"]
+
+# VV: We also create a couple of OpenShift routes to expose services that we spin up
+- apiGroups:
+    - route.openshift.io
+  resources:
+    - routes
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+# VV: We also create a couple of OpenShift routes to expose services that we spin up
+- apiGroups:
+    - route.openshift.io
+  resources:
+    - routes/custom-host
+  verbs: ["create"]
+
+# VV: We don't use deployments now but may end up using them in the future
+- apiGroups:
+    - apps
+  resources:
+    - deployments
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+# VV: Required to launch and manage Jobs in the namespace
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+# VV: This is for common k8s objects such as pods, sa, secrets, etc
+- apiGroups:
+  - ""
+  resources:
+    - replicationcontrollers
+    - serviceaccounts
+    - configmaps
+    - endpoints
+    - pods
+    - secrets
+    # VV: we can optionally check whether users have access to services living in this
+    # namespace before we let them access the st4sd microservices
+    - services
+    # VV: We don't need these ones below for deploying but having them around makes it that 
+    # much easier to troubleshoot the workflow stack
+    - pods/attach
+    - pods/exec
+  verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+- apiGroups:
+  - ""
+  resources:
+    - events
+  verbs: ["create", "get", "list", "patch", "watch"]
+
+- apiGroups:
+  - ""
+  resources:
+    - pods/log
+  verbs: ["get", "list", "watch"]
+
+# VV: This is for creating/managing Workflow and Dataset objects
+- apiGroups:
+    # VV: This is the old ApiGroup it's deprecated and will be removed
+  - hpsys.ie.ibm.com
+  - st4sd.ibm.com
+  - com.ie.ibm.hpsys
+  resources:
+  - '*'
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - watch
+  - update
+
+{{ end }}

@@ -1,0 +1,11 @@
+{{ if .Values.installWorkflowOperator }}
+apiVersion: v1
+data:
+  passwd: "root:x:0:0:root:/root:/bin/bash\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\n\
+    git-sync:x:{{int64 .Values.workflowContainersUid}}:{{int64 .Values.workflowContainersUid}}::/tmp:/sbin/nologin\n"
+kind: ConfigMap
+metadata:
+  labels:
+    st4sd.ibm.com/component: instance
+  name: git-sync-config
+{{ end }}

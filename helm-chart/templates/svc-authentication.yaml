@@ -1,0 +1,28 @@
+{{ if .Values.installAuthentication }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    st4sd.ibm.com/component: authentication
+    workflow.stack/part: authentication
+  name: st4sd-authentication
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: st4sd-authentication-tls
+    service.alpha.openshift.io/serving-cert-secret-name: st4sd-authentication-tls
+
+spec:
+  ports:
+  - name: http
+    port: 5003
+    protocol: TCP
+    targetPort: 5003
+  - name: oauth
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: st4sd-authentication
+  sessionAffinity: None
+  type: ClusterIP
+
+{{ end }}

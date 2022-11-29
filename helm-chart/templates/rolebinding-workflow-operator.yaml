@@ -1,0 +1,23 @@
+{{ if .Values.installRBACNamespaced }}
+
+apiVersion: authorization.openshift.io/v1
+groupNames: null
+kind: RoleBinding
+metadata:
+  # VV: Do not modify this object - helm may override your changes on an update.
+  # Create a new RoleBinding object instead.
+  annotations:
+    st4sd.ibm.com/warning: do-not-edit-this-object-create-new-role-binding
+  labels:
+    st4sd.ibm.com/component: rbac-namespaced
+  name: st4sd-workflow-operator-do-not-modify
+roleRef:
+  name: st4sd-stack-deploy
+  kind: Role
+  namespace: {{ .Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.serviceAccountWorkflowOperator }}
+    namespace: {{ .Release.Namespace }}
+
+{{ end }}

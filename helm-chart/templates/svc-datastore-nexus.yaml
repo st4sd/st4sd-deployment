@@ -1,0 +1,24 @@
+{{ if .Values.installDatastore }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    st4sd.ibm.com/component: datastore-nexus
+  name: st4sd-datastore-nexus
+spec:
+  ports:
+  - name: mongodb-proxy
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  - name: gateway-registry
+    port: 5001
+    protocol: TCP
+    targetPort: 5001
+  selector:
+    app: st4sd-datastore-nexus
+  sessionAffinity: None
+  type: ClusterIP
+
+{{ end }}

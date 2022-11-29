@@ -1,0 +1,161 @@
+{{ if .Values.installAuthentication }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    name: st4sd-authentication
+    st4sd.ibm.com/component: authentication
+  name: st4sd-authentication
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    app: st4sd-authentication
+    st4sd.ibm.com/component: authentication
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: st4sd-authentication
+        st4sd.ibm.com/component: authentication
+    spec:
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: nginx
+        image: {{ .Values.imagesDatastore }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        command:
+          - /scripts/nginx-full.sh
+        env:
+          # VV: Ask  /scripts/nginx-full.sh to setup reverse-proxy for:
+          # 1. ds-gateway, 2. ds-gateway-registry, 3. ds-mongo-proxy, 4. runtime-service
+          - name: NGINX_SERVER_DATASTORE_GATEWAY
+            value: ds-gateway/
+          - name: NGINX_SERVER_DATASTORE_GATEWAY_REGISTRY
+            value: ds-registry/
+          - name: NGINX_SERVER_DATASTORE_MONGO_PROXY
+            value: ds-mongodb-proxy/
+          - name: NGINX_SERVER_RUNTIME_SERVICE
+            value: rs/
+        {{ if not .Values.isGlobalRegistry }}
+          - name: NGINX_SERVER_REGISTRY_UI
+            value: registry-ui/
+        {{ end }}
+          # VV: These reference the names of the Service objects that the template
+          # creates. Kubernetes injects environment variables to Pods with information
+          # about the services (host, port, etc).
+          # see https://kubernetes.io/docs/concepts/services-networking/service/#environment-variables
+          # use the suffix "_TCP_PORT" to get the port number and "_TCP_ADDR" to get the IP address
+          - name: KUBERNETES_PREFIX_DATASTORE_GATEWAY
+            value: ST4SD_DATASTORE_CLOUD_INSTANCE_PORT_5002
+          - name: KUBERNETES_PREFIX_DATASTORE_GATEWAY_REGISTRY
+            value: ST4SD_DATASTORE_NEXUS_PORT_5001
+          - name: KUBERNETES_PREFIX_DATASTORE_MONGO_PROXY
+            value: ST4SD_DATASTORE_NEXUS_PORT_5000
+          - name: KUBERNETES_PREFIX_RUNTIME_SERVICE
+            value: ST4SD_RUNTIME_SERVICE_PORT_4000
+        {{ if not .Values.isGlobalRegistry }}
+          - name: KUBERNETES_PREFIX_REGISTRY_UI
+            value: ST4SD_REGISTRY_UI_PORT_8080
+        {{ end }}          
+          - name: NGINX_PORT
+            value: "5003"
+        ports:
+          - containerPort: 5003
+            protocol: TCP
+
+        resources: {{ toYaml .Values.resources.authenticationProxy | nindent 10 }}
+
+      - name: oauth-proxy
+        command: ["/usr/bin/bash"]
+        args:
+          - "-c"
+          - |
+            export oauth_proxy_args="-provider=openshift
+            -https-address=:8888
+            -http-address=
+            -email-domain=*
+            -skip-auth-preflight
+            -upstream=http://localhost:5003
+            -tls-cert=/etc/tls/private/tls.crt
+            -tls-key=/etc/tls/private/tls.key
+            -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+            -cookie-secret-file=/etc/proxy/secrets/session_secret
+            -openshift-service-account={{ .Values.serviceAccountWorkflowOperator }}
+            -openshift-delegate-urls={\"/\":{\"resource\":\"services\",\"verb\":\"get\",\"namespace\":\"{{ .Release.Namespace }}\"}}
+            -openshift-sar={\"namespace\":\"{{ .Release.Namespace }}\",\"resource\":\"services\",\"name\":\"st4sd-authentication\",\"verb\":\"get\"}
+            -cookie-name=oauth-proxy
+            -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
+            if [[ -f "/etc/tls/openshift-certificate/ca-bundle.crt" ]]; then
+              export oauth_proxy_args="${oauth_proxy_args} -openshift-ca=/etc/tls/openshift-certificate/ca-bundle.crt";
+            fi;
+            echo "Arguments to oauth-proxy: ${oauth_proxy_args}";
+            /usr/bin/oauth-proxy ${oauth_proxy_args}
+          # VV: Notice the 2 options above to perform Authorization on top of Authentication
+          # -openshift-delegate-urls -> OpenShift users must be able to "get" Services in the current namespace
+          # -openshift-sar           -> OpenShift users must be able to "get" the "workflow-stack" Service object
+          # VV: OpenShift 4 supports injecting trusted CA certificates to ConfigMaps, but that's
+          #     not the case for OpenShift 3.11. To maintain backwards compatibility we can only attempt to
+          #     use a CA bundle IFF the CA file /etc/tls/openshift-certificate/ca-bundle.crt exists
+        # VV: More recent versions require permissions to read objects (e.g ConfigMaps) in system namespaces
+        image: quay.io/openshift/origin-oauth-proxy:4.6.0
+        imagePullPolicy: Always
+        ports:
+          - name: oauth-proxy
+            containerPort: 8888
+            protocol: TCP
+        volumeMounts:
+          - name: secret-tls
+            mountPath: /etc/tls/private
+          - mountPath: /etc/proxy/secrets
+            name: auth-seed
+          - name: trusted-certificates-ca
+            mountPath: /etc/tls/openshift-certificate/
+        resources: {{ toYaml .Values.resources.authenticationProxy | nindent 10 }}
+      dnsPolicy: ClusterFirst
+      serviceAccountName: {{ .Values.serviceAccountWorkflowOperator }}
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 31
+      volumes:
+        - name: secret-tls
+          secret:
+            defaultMode: 420
+            secretName: st4sd-authentication-tls
+        - name: auth-seed
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.oauthProxySeedSecretName }}
+        - name: trusted-certificates-ca
+          configMap:
+            name: trusted-certificates-ca
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+   - imageChangeParams:
+       automatic: true
+       containerNames:
+       - nginx
+       from:
+         kind: ImageStreamTag
+         name: {{ .Values.imageStreamTagDatastore }}{{ .Values.imagesVariant }}
+     type: ImageChange
+  {{ end }}
+   - type: ConfigChange
+{{end}}

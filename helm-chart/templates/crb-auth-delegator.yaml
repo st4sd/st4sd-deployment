@@ -1,0 +1,17 @@
+{{ if .Values.installRBACClusterScoped }}
+
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    workflow.stack/part: oauth-proxy
+    st4sd.ibm.com/component: oauth-proxy
+  name: wf-auth-delegator-{{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccountWorkflowOperator }}
+  namespace: {{ .Release.Namespace }}
+{{ end }}

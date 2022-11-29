@@ -1,0 +1,206 @@
+# Copyright IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Authors:
+#  Vassilis Vassiliadis
+#  Alessandro Pomponio
+
+installGithubSecretOAuth: true
+# IF above is true, also provide an gitOAuthToken value
+gitOAuthToken: null
+gitOAuthSecretName: git-creds-oauth
+
+allowAllAuthenticatedToAccessRestAPIs: false
+
+experimentImagePullSecrets: []
+
+workflowImagePullSecret: wf-stack-pull-secret
+contribApplicationsImagePullSecret: st4sd-contrib-applications
+communityApplicationsImagePullSecret: st4sd-community-applications
+
+installImagePullSecretWorkflowStack: true
+installImagePullSecretContribApplications: true
+installImagePullSecretCommunityApplications: true
+
+# Set this to false if using the open-source version of ST4SD
+useImagePullSecretWorkflowStack: true
+useImagePullSecretContribApplications: true
+useImagePullSecretCommunityApplications: true
+
+# IF installImagePullSecretWorkflowStack is true, also provide:
+#  - imagePullSecretWorkflowStackUsername
+#  - imagePullSecretWorkflowStackPassword
+#  - imagePullSecretWorkflowStackRegistryURL
+# this will create the "wf-stack-pull-secret" secret
+# IF installImagePullSecretWorkflowStack is False then also modify
+# experimentImagePullSecrets and workflowImagePullSecret
+imagePullSecretWorkflowStackUsername: null
+imagePullSecretWorkflowStackPassword: null
+imagePullSecretWorkflowStackRegistryURL: null
+
+# Ditto but for installImagePullSecretContribApplications
+# if username/password is null it defaults to username/password for imagePullSecretWorkflowStack
+imagePullSecretContribApplicationsUsername: null
+imagePullSecretContribApplicationsPassword: null
+imagePullSecretContribApplicationsRegistryURL: null
+
+# Ditto but for installImagePullSecretCommunityApplications
+# if username/password is null it defaults to username/password for imagePullSecretWorkflowStack
+imagePullSecretCommunityApplicationsUsername: null
+imagePullSecretCommunityApplicationsPassword: null
+imagePullSecretCommunityApplicationsRegistryURL: null
+
+installDatastoreSecretMongoDB: true
+installRuntimeServiceConfigMap: true
+installRegistryBackendConfigMap: true
+installRegistryUINginxConfigMap: true
+
+installRBACNamespaced: true
+installRBACClusterScoped: true
+installDeployer: true
+
+installWorkflowOperator: true
+installDatastore: true
+installRuntimeService: true
+installAuthentication: true
+installRegistryBackend: true
+installRegistryUI: true
+
+# Changes the values for the backend configmap depending on
+# whether this is a "global registry" deployment or not.
+# This will change the UI's behaviour.
+isGlobalRegistry: false
+
+# When set to true DeploymentConfig objects use imageStreamTags
+# which means that after deploying this helm-chart you need to run `oc import-image`
+useImageStreamTags: true
+
+# The names of the Persistent Volume Claims to use. Helm chart assumes that these have already been created
+pvcForWorkflowInstances: workflow-instances
+pvcForDatastoreMongoDB: datastore-mongodb
+pvcForRuntimeServiceMetadata: runtime-service
+
+# Images bellow are always referenced as 
+#  {{ .Values.image<image> }}{{ .Values.imagesVariant }}
+
+imagesVariant: ":platform-release-latest"
+imagesRuntimeCore: "quay.io/st4sd/official-base/st4sd-runtime-core"
+imagesDatastoreMongoDB: "quay.io/st4sd/official-base/st4sd-datastore-mongodb"
+imagesRuntimeMonitoring: "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring"
+imagesRuntimeS3Fetch: "quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3"
+imagesRuntimeOperator: "quay.io/st4sd/official-base/st4sd-runtime-k8s"
+imagesRuntimeService: "quay.io/st4sd/official-base/st4sd-runtime-service"
+imagesDatastore: "quay.io/st4sd/official-base/st4sd-datastore"
+imagesRegistryBackend: "quay.io/st4sd/official-base/st4sd-registry-backend"
+imagesRegistryUI: "quay.io/st4sd/official-base/st4sd-registry-ui"
+
+# git-sync is an external image (https://github.com/kubernetes/git-sync) - it does not need an `imagesVariant`
+imagesRuntimeGitSync: "k8s.gcr.io/git-sync/git-sync:v3.6.1"
+
+# imageStreamTags are referenced by templates in the same way as `images` above
+# example: {{ .Values.imageStreamTagRuntimeOperator }}{{ .Values.imagesVariant }}
+imageStreamTagRuntimeOperator: "st4sd-runtime-k8s"
+imageStreamTagDatastore: "st4sd-datastore"
+imageStreamTagRuntimeService: "st4sd-runtime-service"
+imageStreamTagDatastoreMongoDB: "st4sd-datastore-mongodb"
+imageStreamTagRegistryBackend: "st4sd-registry-backend"
+imageStreamTagRegistryUI: "st4sd-registry-ui"
+
+serviceAccountDeployNamespacedObjects: "wf-deploy"
+serviceAccountWorkflowOperator: "workflow-operator"
+
+# VV: This service account uses the same SCC therefore has the same UID and can
+# read the files of Workflow pods on the common PVCs
+serviceAccountWithSCC: "configure-uid"
+
+# SecurityContextConstraints options
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+namespaceContainersUidRangeMin: 1000140001
+namespaceContainersUidRangeMax: 1000170000
+# VV: workflowContainersUid must be in the range [namespaceContainersUidRangeMin, namespaceContainersUidRangeMax]
+# VV: Pods that mount common PVCs (e.g. pvcForWorkflowInstances)
+# should use the same UID so that they can all read each other's files
+workflowContainersUid: 1000140001
+workflowContainersGroupId: 0
+# VV: The PVC is mounted under /data/db/  - datastoreMongoDBRelativePath is suffixed to the mountpath
+# to control where mongodb stores its files. When unsure,  accept the default value `mongodb`.
+datastoreMongoDBRelativePath: mongodb
+datastoreMongoDBSecretName: st4sd-datastore-mongodb-credentials
+
+# Rest of values used to populate the st4sd-runtime-service ConfigMap
+# + imagesRuntimeCore, imagesRuntimeMonitoring, imagesS3Fetch
+
+# if installDatastore is set to true, this helm chart will
+# create the route ${datastoreLabelGateway}-{namespace}.${clusterRouteDomain}
+# Leave empty to auto-detect, works on IBM Cloud OpenShift 4.5+
+clusterRouteDomain: ""
+
+# The Route will use ${routePrefix}.${clusterRouteDomain}. You need to make sure that your cluster does not
+# have an existing route with the host ${routePrefix}.${clusterRouteDomain}
+routePrefix: st4sd-prod
+
+runtimeServiceConfigConfigMapName: st4sd-runtime-service
+registryBackendConfigConfigMapName: st4sd-registry-backend
+registryUINginxConfigConfigMapName: st4sd-registry-ui-nginx
+oauthProxySeedSecretName: st4sd-runtime-service-auth-seed
+datastoreFileMaxSize: 33554432
+datastoreLabelGateway: prod1
+
+# gitSecret: git-creds
+
+# Default command line arguments to the orchestrator of virtual experiments.
+# The format is a list of dictionaries. A key of a nested dictionary is the name of a parameter.
+# For example, the arguments `-m author:mary -m project:surrogate-models --registerWorkflow=y` would
+# be encoded as: [{"-m": "author:mary"}, {"-m": "project:surrogate-models", "--registerWorkflow": "y"}]
+# notice that the above enables you to provide the same argument multiple times (here "-m" for user-metadata key-value).
+defaultOrchestratorArguments: []
+
+namespaceContainersFsGroupCommon: 5000
+namespaceContainersFsGroupRangeMin: 5000
+namespaceContainersFsGroupRangeMax: 25000
+
+resources:
+  datastoreMongoDB:
+    limits:
+      cpu: 1000m
+      memory: 4Gi
+  datastoreInstanceReporter:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  datastoreNexusDBProxy:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  datastoreInstanceGateway:
+    limits:
+      cpu: 250m
+      memory: 500Mi
+  datastoreNexusRegistry:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  authenticationNginx:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+  authenticationProxy:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+  runtimeK8s:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  runtimeService:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  registryBackend:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  registryUI:
+    limits:
+      cpu: 250m
+      memory: 256Mi

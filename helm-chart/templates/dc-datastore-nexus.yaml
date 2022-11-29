@@ -1,0 +1,122 @@
+{{ if .Values.installDatastore }}
+
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    st4sd.ibm.com/component: datastore
+  name: st4sd-datastore-nexus
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: st4sd-datastore-nexus
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: st4sd-datastore-nexus
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountWithSCC }}
+      securityContext:
+        runAsUser: {{int64 .Values.workflowContainersUid}}
+        runAsGroup: {{ int64 .Values.workflowContainersGroupId }}
+        fsGroup: {{ int64 .Values.namespaceContainersFsGroupCommon }}
+      containers:
+      - name: mongodb-proxy
+        command:
+          - /scripts/mongodb_rest.sh
+        env:
+          - name: FLASK_URL_PREFIX
+            # VV: The flask app serves requests whose HTTP PATH starts with /ds-mongodb-proxy
+            value: /ds-mongodb-proxy
+          - name: MONGODB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: {{ .Values.datastoreMongoDBSecretName }}
+          - name: MONGODB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: {{ .Values.datastoreMongoDBSecretName }}
+          - name: MONGODB_AUTHSOURCE
+            value: admin
+          - name: "EXTERNAL_PORT"
+            value: "5000"
+        image: {{ .Values.imagesDatastore }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        
+        ports:
+          - name: mongodb-proxy
+            containerPort: 5000
+            protocol: TCP
+        
+        resources: {{ toYaml .Values.resources.datastoreNexusDBProxy | nindent 10}}
+
+        volumeMounts:
+          - name: shared
+            mountPath: /shared
+          - name: working-volume
+            mountPath: /tmp/workdir
+      - name: registry
+        command:
+          - /scripts/gateway_registry.sh
+        image: {{ .Values.imagesDatastore }}{{ .Values.imagesVariant }}
+        imagePullPolicy: Always
+        env:
+          - name: FLASK_URL_PREFIX
+            # VV: The flask app serves requests whose HTTP PATH starts with /ds-registry
+            value: /ds-registry
+          - name: "EXTERNAL_PORT"
+            value: "5001"
+        ports:
+          - name: registry
+            containerPort: 5001
+            protocol: TCP
+
+        resources: {{ toYaml .Values.resources.datastoreNexusRegistry | nindent 10 }}
+
+        volumeMounts:
+          - name: working-volume
+            mountPath: /tmp/workdir
+          - name: shared
+            mountPath: /shared
+      dnsPolicy: ClusterFirst
+      {{ if .Values.useImagePullSecretWorkflowStack }}
+      imagePullSecrets:
+        - name: "{{- printf .Values.workflowImagePullSecret }}"
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: working-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvcForWorkflowInstances }}
+        - name: shared
+          emptyDir: {}
+  test: false
+  triggers:
+  {{ if .Values.useImageStreamTags }}
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - mongodb-proxy
+      - registry
+      from:
+        kind: ImageStreamTag
+        name: {{ .Values.imageStreamTagDatastore }}{{ .Values.imagesVariant }}
+    type: ImageChange
+  {{ end }}
+  - type: ConfigChange
+
+
+{{ end }}
