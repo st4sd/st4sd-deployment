@@ -4,7 +4,7 @@
 #  Vassilis Vassiliadis
 #  Alessandro Pomponio
 
-installGithubSecretOAuth: true
+installGithubSecretOAuth: false
 # IF above is true, also provide an gitOAuthToken value
 gitOAuthToken: null
 gitOAuthSecretName: git-creds-oauth

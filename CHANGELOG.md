@@ -1,3 +1,14 @@
+# 2.0.0-alpha6
+
+### New enhancements
+
+- Improved search functionality in the Experiment Registry UI
+- Improved error-reporting in st4sd-runtime-service
+
+### Bugs and regressions
+- Surrogates: st4sd-runtime-service uses intra-dependencies to reduce the set of parameters which require an explicit `relationship.graphParameteers` mapping
+- Fix resolution of environment variables in Components which use a `DEFAULTS` instruction
+
 # 2.0.0-alpha
 
 ### New enhancements
