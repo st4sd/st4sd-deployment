@@ -26,12 +26,12 @@ if [ "${ST4SD_DEVELOPMENT}" != "yes" ]; then
 
   echo "Importing images from ${reg_prefix}"
 
-  oc import-image st4sd-datastore-mongodb${ST4SD_TAG} --from=${reg_prefix}st4sd-datastore-mongodb${ST4SD_TAG} --confirm
-  oc import-image st4sd-runtime-k8s${ST4SD_TAG} --from=${reg_prefix}st4sd-runtime-k8s${ST4SD_TAG} --confirm
-  oc import-image st4sd-datastore${ST4SD_TAG} --from=${reg_prefix}st4sd-datastore${ST4SD_TAG} --confirm
-  oc import-image st4sd-runtime-service${ST4SD_TAG} --from=${reg_prefix}st4sd-runtime-service${ST4SD_TAG} --confirm
-  oc import-image st4sd-registry-backend${ST4SD_TAG} --from=${reg_prefix}st4sd-registry-backend${ST4SD_TAG} --confirm
-  oc import-image st4sd-registry-ui${ST4SD_TAG} --from=${reg_prefix}st4sd-registry-ui${ST4SD_TAG} --confirm
+  oc import-image --confirm=true st4sd-datastore-mongodb${ST4SD_TAG} --from=${reg_prefix}st4sd-datastore-mongodb${ST4SD_TAG}
+  oc import-image --confirm=true st4sd-runtime-k8s${ST4SD_TAG} --from=${reg_prefix}st4sd-runtime-k8s${ST4SD_TAG}
+  oc import-image --confirm=true st4sd-datastore${ST4SD_TAG} --from=${reg_prefix}st4sd-datastore${ST4SD_TAG}
+  oc import-image --confirm=true st4sd-runtime-service${ST4SD_TAG} --from=${reg_prefix}st4sd-runtime-service${ST4SD_TAG}
+  oc import-image --confirm=true st4sd-registry-backend${ST4SD_TAG} --from=${reg_prefix}st4sd-registry-backend${ST4SD_TAG}
+  oc import-image --confirm=true st4sd-registry-ui${ST4SD_TAG} --from=${reg_prefix}st4sd-registry-ui${ST4SD_TAG}
 else
   # To update the Development pods all we need to do is delete them so that they get rescheduled
   echo "Deleting ST4SD deployment pods to cause them to be re-created"

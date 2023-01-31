@@ -65,6 +65,15 @@ function echo_options_for_images_and_pull_secrets() {
   # VV: Set $1 to MayInstallSecretsToo to inspect environment variables and decide whether to install secrets
   options=${1}
 
+  export ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE=${ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE:-"no"}
+  export ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS:-"no"}
+  export ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS:-"no"}
+
+  export ST4SD_IMAGES_OFFICIAL_BASE_REGISTRY=${ST4SD_IMAGES_OFFICIAL_BASE_REGISTRY:-"quay.io"}
+  export ST4SD_IMAGES_OFFICIAL_BASE_PREFIX=${ST4SD_IMAGES_OFFICIAL_BASE_PREFIX:-"st4sd/official-base/"}
+  export ST4SD_IMAGES_CONTRIB_APPLICATIONS_REGISTRY=${ST4SD_IMAGES_CONTRIB_APPLICATIONS_REGISTRY:-"quay.io"}
+  export ST4SD_IMAGES_COMMUNITY_APPLICATIONS_REGISTRY=${ST4SD_IMAGES_COMMUNITY_APPLICATIONS_REGISTRY:-"quay.io"}
+
   # VV: if we're installing open-source version, and we have not explicitly configured
   # whether to create imagePullSecrets or not, THEN do not create secrets
   # If we're using the internal Images and we have not explicitly configured
@@ -151,7 +160,6 @@ EOF
     fi
 
     reg_prefix="${reg_url}${ST4SD_IMAGES_OFFICIAL_BASE_PREFIX}"
-
     cat <<EOF
 imagesRuntimeCore: $(rewrite_url st4sd-runtime-core ${reg_prefix})
 imagesDatastoreMongoDB: $(rewrite_url st4sd-datastore-mongodb ${reg_prefix})
@@ -162,6 +170,20 @@ imagesRuntimeService: $(rewrite_url st4sd-runtime-service ${reg_prefix})
 imagesDatastore: $(rewrite_url st4sd-datastore ${reg_prefix})
 imagesRegistryBackend: $(rewrite_url st4sd-registry-backend ${reg_prefix})
 imagesRegistryUI: $(rewrite_url st4sd-registry-ui ${reg_prefix})
+EOF
+
+  else
+    public_base_images="quay.io/st4sd/official-base"
+    cat <<EOF
+imagesRuntimeCore: ${public_base_images}/st4sd-datastore-core
+imagesDatastoreMongoDB: ${public_base_images}/st4sd-datastore-mongodb
+imagesRuntimeMonitoring: ${public_base_images}/st4sd-runtime-k8s-monitoring
+imagesRuntimeS3Fetch: ${public_base_images}/st4sd-runtime-k8s-input-s3
+imagesRuntimeOperator: ${public_base_images}/st4sd-runtime-k8s
+imagesRuntimeService: ${public_base_images}/st4sd-runtime-service
+imagesDatastore: ${public_base_images}/st4sd-datastore
+imagesRegistryBackend: ${public_base_images}/st4sd-registry-backend
+imagesRegistryUI: ${public_base_images}/st4sd-registry-ui
 EOF
   fi
 
