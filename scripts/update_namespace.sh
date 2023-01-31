@@ -33,9 +33,14 @@ if [[ -z "$OC_LOGIN_TOKEN" ]]; then
 fi
 
 ${dirScripts}/ensure_oc.sh
-wget https://get.helm.sh/helm-v3.8.2-linux-amd64.tar.gz
-tar -xvf helm-v3.8.2-linux-amd64.tar.gz
-export PATH=$PATH:`pwd`/linux-amd64
+
+helm version
+
+if [[ $? != 0 ]]; then
+  wget https://get.helm.sh/helm-v3.8.2-linux-amd64.tar.gz
+  tar -xvf helm-v3.8.2-linux-amd64.tar.gz
+  export PATH=$PATH:`pwd`/linux-amd64
+fi
 
 echo "Path is ${PATH}"
 
@@ -46,17 +51,18 @@ oc login "${OC_LOGIN_URL}" --token "${OC_LOGIN_TOKEN}" --insecure-skip-tls-verif
 
 oc project ${NAMESPACE_TARGET}
 
+dirScripts=`dirname "${0}"`
 export CUSTOM_HELM_VALUES="no"
 
 export ST4SD_USE_PUBLIC_IMAGES=${ST4SD_USE_PUBLIC_IMAGES:-"yes"}
 
-export ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE=${ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE:-"yes"}
-export ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS:-"yes"}
-export ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS:-"yes"}
+export ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE=${ST4SD_INSTALL_IMAGE_PULL_SECRET_OFFICIAL_BASE:-"no"}
+export ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_CONTRIB_APPS:-"no"}
+export ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS=${ST4SD_INSTALL_IMAGE_PULL_SECRET_COMMUNITY_APPS:-"no"}
 
-export ST4SD_IMAGES_OFFICIAL_BASE_REGISTRY=res-st4sd-team-official-base-docker-local.artifactory.swg-devops.com
-export ST4SD_IMAGES_OFFICIAL_BASE_PREFIX=${ST4SD_IMAGES_OFFICIAL_BASE_PREFIX:-""}
-export ST4SD_IMAGES_CONTRIB_APPLICATIONS_REGISTRY=res-st4sd-team-contrib-applications-docker-local.artifactory.swg-devops.com
-export ST4SD_IMAGES_COMMUNITY_APPLICATIONS_REGISTRY=res-st4sd-community-team-applications-docker-virtual.artifactory.swg-devops.com
+export ST4SD_IMAGES_OFFICIAL_BASE_REGISTRY=${ST4SD_IMAGES_OFFICIAL_BASE_REGISTRY:-"quay.io"}
+export ST4SD_IMAGES_OFFICIAL_BASE_PREFIX=${ST4SD_IMAGES_OFFICIAL_BASE_PREFIX:-"st4sd/official-base/"}
+export ST4SD_IMAGES_CONTRIB_APPLICATIONS_REGISTRY=${ST4SD_IMAGES_CONTRIB_APPLICATIONS_REGISTRY:-"quay.io"}
+export ST4SD_IMAGES_COMMUNITY_APPLICATIONS_REGISTRY=${ST4SD_IMAGES_COMMUNITY_APPLICATIONS_REGISTRY:-"quay.io"}
 
 ${dirScripts}/namespaced-managed.sh
