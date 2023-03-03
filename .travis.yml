@@ -1,0 +1,38 @@
+language: python
+
+stages:
+  # VV: Creates ":platform-release-latest" manifests from ":release-candidate" ones using skopeo
+  # Also pushes :bundle-${TRAVIS_TAG} e.g :bundle-2.0.0. The travis tag *should* be the same as
+  # TRAVIS_TAG (i.e. git tag) should be the same as the `appVersion` field in helm-chart/Chart.yaml
+- name: images-for-platform-release-latest
+  if: tag is present
+
+python: 3.8
+script: []
+install:
+  - python3 -m pip install tox
+  - git clone https://${DEPLOY_ACCESS_TOKEN}@github.ibm.com/hartreechem/deploy.git deploy_repo
+  - cd deploy_repo
+  - tox -e py3
+  - source toxenv/bin/activate
+  - cd ..
+  - python3 -m pip install .
+
+jobs:
+  allow_failures:
+    - env:
+      - TEST_CAN_FAIL=TRUE
+  include:
+    - stage: images-for-platform-release-latest
+      services:
+        - docker
+      env:
+        - TAG_SOURCE=release-candidate
+      script:
+        - export DOCKER_REGISTRY=${DOCKER_REGISTRY:-quay.io}
+        - export IMG_NAME_IN_PREFIX=${IMG_NAME_IN_PREFIX:-/st4sd/official-base/}
+        - export IMG_NAME_OUT_PREFIX=${IMG_NAME_OUT_PREFIX:-/st4sd/official-base/}
+        - deprepo.py -p platform-release-latest --streamOutput
+            -o st4sd -r st4sd-deployment -c --disableContexts
+            --deploymentMessage="New platform-release-latest for ST4SD ${TRAVIS_TAG}"
+            -d deploy platform_release_latest.yaml

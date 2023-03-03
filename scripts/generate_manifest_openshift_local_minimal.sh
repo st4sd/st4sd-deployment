@@ -20,7 +20,7 @@ if [ "${ST4SD_DEVELOPMENT}" == "yes" ]; then
   st4sd_tag="latest"
   st4sd_use_image_stream_tags="false"
 else
-  st4sd_tag="platform-release-latest"
+  st4sd_tag="bundle-2.0.0-alpha7"
   st4sd_use_image_stream_tags="true"
 fi
 

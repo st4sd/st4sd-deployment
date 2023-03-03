@@ -1,0 +1,22 @@
+# Copyright IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Authors:
+#  Vassilis Vassiliadis
+
+deploy:
+  - echo "Mirroring :bundle-${TRAVIS_TAG}"
+  - docker run --rm -it
+    --env DOCKER_REGISTRY --env DOCKER_TOKEN --env DOCKER_USERNAME
+    --env DOCKER_REGISTRY_OUT="${DOCKER_REGISTRY}"
+    --env IMG_NAME_OUT_PREFIX --env IMG_NAME_IN_PREFIX
+    --env TAG_SOURCE="${TAG_SOURCE}" --env TAG_DESTINATION="bundle-${TRAVIS_TAG}"
+    -v `pwd`/scripts:/scripts -w /scripts --entrypoint bash
+    quay.io/skopeo/stable update_release_images.sh
+  - echo "Mirroring :platform-latest-release"
+  - docker run --rm -it
+    --env DOCKER_REGISTRY --env DOCKER_TOKEN --env DOCKER_USERNAME
+    --env DOCKER_REGISTRY_OUT="${DOCKER_REGISTRY}"
+    --env IMG_NAME_OUT_PREFIX --env IMG_NAME_IN_PREFIX
+    --env TAG_SOURCE="${TAG_SOURCE}" --env TAG_DESTINATION="platform-release-latest"
+    -v `pwd`/scripts:/scripts -w /scripts --entrypoint bash
+    quay.io/skopeo/stable update_release_images.sh

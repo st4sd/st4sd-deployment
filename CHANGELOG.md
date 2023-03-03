@@ -1,3 +1,14 @@
+# 2.0.0-alpha7
+
+### New enhancements
+
+- Allow fetching measured properties in st4sd-registry-backend
+- Show measured properties for runs in st4sd-registry-ui
+
+### Security
+
+- Fix CVE-2022-25881 in st4sd-registry-ui
+
 # 2.0.0-alpha6
 
 ### New enhancements
