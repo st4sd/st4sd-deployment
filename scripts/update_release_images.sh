@@ -8,8 +8,8 @@
 # VV: See checks below for environment variables that the script expects and their meaning
 export DOCKER_REGISTRY_OUT=${DOCKER_REGISTRY_OUT:-${DOCKER_REGISTRY}}
 
-export IMG_NAME_IN_PREFIX=${IMG_NAME_IN_PREFIX:-"/"}
-export IMG_NAME_OUT_PREFIX=${IMG_NAME_OUT_PREFIX:-"/"}
+export IMG_NAME_IN_PREFIX=${IMG_NAME_IN_PREFIX:-"/st4sd/official-base/"}
+export IMG_NAME_OUT_PREFIX=${IMG_NAME_OUT_PREFIX:-"/st4sd/official-base/"}
 
 if [[ -z "${DOCKER_USERNAME}" ]]; then
     echo "Expecting DOCKER_USERNAME environment variable (username for skopeo login, e.g. st4sd-robot)"
@@ -57,9 +57,10 @@ fi
 
 
 for img in ${images[@]}; do
-    img_in=${DOCKER_REGISTRY}/${img}:${TAG_SOURCE}
+    img_in=${DOCKER_REGISTRY}${IMG_NAME_IN_PREFIX}${img}:${TAG_SOURCE}
     img_out=${DOCKER_REGISTRY_OUT}${IMG_NAME_OUT_PREFIX}${img}:${TAG_DESTINATION}
 
+    echo "Mirroring ${img_in} --to--> ${img_out}"
     skopeo copy --insecure-policy --src-tls-verify=false --dest-tls-verify=false --multi-arch all --retry-times=5 \
         docker://${img_in}  docker://${img_out}
 done
@@ -67,8 +68,8 @@ done
 set +x
 echo  "Finished mirroring"
 for img in ${images[@]}; do
-    img_in=${DOCKER_REGISTRY}/${img}:${TAG_SOURCE}
+    img_in=${DOCKER_REGISTRY}${IMG_NAME_IN_PREFIX}${img}:${TAG_SOURCE}
     img_out=${DOCKER_REGISTRY_OUT}${IMG_NAME_OUT_PREFIX}${img}:${TAG_DESTINATION}
 
-    echo "  ${img_in} --mirrored-to--> ${img_out}"
+    echo "${img_in} --mirrored-to--> ${img_out}"
 done

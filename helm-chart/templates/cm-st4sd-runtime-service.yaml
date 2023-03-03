@@ -9,10 +9,10 @@ metadata:
   name: {{ .Values.runtimeServiceConfigConfigMapName }}
 data:
   datastoreLabelGateway:  "{{ .Values.datastoreLabelGateway }}"
-  hostDatastoreGateway: "{{ include "host.workflowStack" . }}/ds-gateway"
-  hostDatastoreRegistry: "{{ include "host.workflowStack" . }}/ds-registry"
-  hostDatastoreRest: "{{ include "host.workflowStack" . }}/ds-mongodb-proxy"
-  hostRuntimeService: "{{ include "host.workflowStack" . }}/rs"
+  hostDatastoreGateway: "{{ include "host.workflowStack" . }}/ds-gateway/"
+  hostDatastoreRegistry: "{{ include "host.workflowStack" . }}/ds-registry/"
+  hostDatastoreRest: "{{ include "host.workflowStack" . }}/ds-mongodb-proxy/"
+  hostRuntimeService: "{{ include "host.workflowStack" . }}/rs/"
   hostST4SD: "{{ include "host.workflowStack" . }}"
 
   # VV: st4sdRuntimeService.imagePullSecrets (in _helpers.tpl) concatenates those already defined in the

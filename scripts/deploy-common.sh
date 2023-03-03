@@ -175,7 +175,7 @@ EOF
   else
     public_base_images="quay.io/st4sd/official-base"
     cat <<EOF
-imagesRuntimeCore: ${public_base_images}/st4sd-datastore-core
+imagesRuntimeCore: ${public_base_images}/st4sd-runtime-core
 imagesDatastoreMongoDB: ${public_base_images}/st4sd-datastore-mongodb
 imagesRuntimeMonitoring: ${public_base_images}/st4sd-runtime-k8s-monitoring
 imagesRuntimeS3Fetch: ${public_base_images}/st4sd-runtime-k8s-input-s3

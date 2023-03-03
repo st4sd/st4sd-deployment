@@ -50,4 +50,3 @@ This project is licensed under the Apache 2.0 license. Please [see details here]
 1. Test your ST4SD deployment using the [st4sd-examples notebooks](https://github.com/st4sd/st4sd-examples).
 1. Visit the ST4SD runtime service: at `${routePrefix}.{clusterRouteDomain}/rs`
     >**Note**: Replace `${key}` with the value of `key` in your `deployment-options.yaml` file (the one that you created when following the [requirements instructions](docs/install-requirements.md)).
-1. Visit the ST4SD Registry website: at `${routePrefix}.{clusterRouteDomain}/registry-ui/`

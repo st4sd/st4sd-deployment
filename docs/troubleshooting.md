@@ -36,7 +36,7 @@ If your ST4SD Runtime Service pod keeps failing check its stdout it's likely tha
 
 ## Miscellaneous
 
-1. If you see pods pending, `oc describe` them to see why they are pending. For example if they are unable to mount the PVCs you created check if you have created them in the namespaced you deployed ST4SD to.
+1. If you see pods pending, `oc describe` them to see why they are pending. For example if they are unable to mount the PVCs you created check if you have created them in the namespace you deployed ST4SD to.
 2. If the pods are unable to connect to MongoDB the MongoDB credentials are likely corrupted. You may get here if between re-installs of ST4SD do not clean up the PVC you selected for `pvcForDatastoreMongoDB` and you have deleted the `st4sd-namespaced-managed` helm-release.
 3. If after a minute of deploying ST4SD you notice that there are ST4SD microservices pods missing. Run `oc get deploymentconfig -n <the ST4SD namespace>`. If you notice that any DeploymentConfig object has `CURRENT` equal to 0 then this means that the pod associated with that DeploymentConfig may not get scheduled. You can get here if the associated `xxx-deploy` pod failed to start the Pod. To resolve this issue, you can delete the DeploymentConfig object and run the command `CUSTOM_HELM_VALUES=no scripts/namespaced-managed.sh`. This will re-create the DeploymentConfig objects.
 
