@@ -1,3 +1,12 @@
+# 2.0.0-alpha8
+
+## New enhancements
+
+- Ensure properties endpoint produces valid JSON in st4sd-registry-backend
+- Add endpoint for retrieving PVEP properties from all of its runs in st4sd-registry-backend
+- Add property table and line chart for all runs of a PVEP in st4sd-registry-ui
+- Allow searching experiments by properties in st4sd-registry-ui
+
 # 2.0.0-alpha7
 
 ### New enhancements
