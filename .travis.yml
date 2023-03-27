@@ -15,7 +15,6 @@ install:
   - cd deploy_repo
   - tox -e py3
   - source toxenv/bin/activate
-  - cd ..
   - python3 -m pip install .
 
 jobs:
