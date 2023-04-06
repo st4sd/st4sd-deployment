@@ -15,7 +15,7 @@ install:
   - cd deploy_repo
   - tox -e py3
   - source toxenv/bin/activate
-  - python3 -m pip install .
+  - cd ..
 
 jobs:
   allow_failures:
