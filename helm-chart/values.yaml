@@ -159,6 +159,8 @@ namespaceContainersFsGroupCommon: 5000
 namespaceContainersFsGroupRangeMin: 5000
 namespaceContainersFsGroupRangeMax: 25000
 
+
+# The resource requests/limits of the microservices
 resources:
   datastoreMongoDB:
     limits:
@@ -201,6 +203,42 @@ resources:
       cpu: 500m
       memory: 256Mi
   registryUI:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+# The resources of the deployment pods that rollout the microservice pods - these are pods that OpenShift
+# creates for handling a DeploymentConfig rollout.
+resourcesDeploymentConfigStrategy:
+  authentication:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  datastoreInstance:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  datastoreMongoDB:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  datastoreNexus:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  registryBackend:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  registryUI:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  runtimeK8s:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  runtimeService:
     limits:
       cpu: 250m
       memory: 256Mi

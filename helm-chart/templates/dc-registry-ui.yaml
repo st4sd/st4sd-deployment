@@ -11,6 +11,11 @@ spec:
   selector:
     app: st4sd-registry-ui
     st4sd.ibm.com/component: registry-ui
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.registryUI | nindent 6 }}
+    recreateParams: { }
+    type: Recreate
   template:
     metadata:
       labels:

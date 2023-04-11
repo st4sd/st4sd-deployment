@@ -11,6 +11,16 @@ spec:
   selector:
     app: st4sd-runtime-service
     st4sd.ibm.com/component: runtime-service
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.runtimeService | nindent 6 }}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
   template:
     metadata:
       labels:

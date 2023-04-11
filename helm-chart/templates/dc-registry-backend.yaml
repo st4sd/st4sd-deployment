@@ -11,6 +11,11 @@ spec:
   selector:
     app: st4sd-registry-backend
     st4sd.ibm.com/component: registry-backend
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.registryBackend | nindent 6 }}
+    recreateParams: { }
+    type: Recreate
   template:
     metadata:
       labels:

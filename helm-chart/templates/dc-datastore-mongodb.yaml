@@ -14,7 +14,7 @@ spec:
     name: st4sd-datastore-mongodb
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.datastoreMongoDB | nindent 6 }}
     recreateParams: {}
     type: Recreate
   template:
