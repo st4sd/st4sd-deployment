@@ -13,7 +13,7 @@ spec:
     app: st4sd-datastore-nexus
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.datastoreNexus | nindent 6 }}
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%

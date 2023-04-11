@@ -14,7 +14,7 @@ spec:
     st4sd.ibm.com/component: workflow-operator
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: {{ toYaml .Values.resourcesDeploymentConfigStrategy.runtimeK8s | nindent 6 }}
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
