@@ -18,11 +18,13 @@ data:
   # VV: st4sdRuntimeService.imagePullSecrets (in _helpers.tpl) concatenates those already defined in the
   # ConfigMap on the server to those defined by the helm chart. If you are using DEBUG=yes what you see below
   # does not include what's on the server. Helm will not contact the server when not actually deploying.
+  # Similary, secret.gitSecretOAuthName will re-use a secret that has been created post-installation if
+  # installGithubSecretOAuth is False (see tempalte comments in _helpers.tpl for more information).
   config.json: |-
     {
-    {{- if .Values.installGithubSecretOAuth  }}
-      "gitsecret-oauth": "{{ .Values.gitOAuthSecretName }}",
-    {{- end }}
+    {{- with include "secret.gitSecretOAuthName" . }}
+      "gitsecret-oauth": {{ . | quote }},
+    {{- end}}
     {{- if .Values.defaultOrchestratorArguments }}
       "default-arguments": {{ .Values.defaultOrchestratorArguments | toJson }},
     {{- end }}

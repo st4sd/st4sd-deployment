@@ -1,3 +1,37 @@
+# 2.0.0-alpha14
+
+## Runtime Service improvements
+
+- Enhanced support for Transformation Relationships: More powerful substitutions (e.g. replace references with variables and vice versa)
+- Generate DSL 2.0 for Parameterised Virtual Experiment Packages (PVEP) (including synthesized ones).
+- Generate a preview of the would-be DSL for a synthetic PVEP before applying a Relationship to synthesize it.
+
+## New enhancements
+
+- Re-use default `gitsecret-oauth` that ST4SD admins manually register in st4sd-runtime-service ConfigMap without using Helm
+
+## Bugs and regressions
+
+- Miscellaneous fixes
+
+# 2.0.0-alpha13
+
+## Registry UI updates
+
+- Upgrade to Vue 3
+- UI can generate `stp login` command (similar to the OpenShift Web Console feature for `oc login`)
+- Miscellaneous enhancements to improve User Interface and User Experience (UI/UX)
+
+## Bugs and regressions
+
+- Miscellaneous fixes
+
+# 2.0.0-alpha12
+
+## New enhancements
+
+- Support deploying ST4SD in namespaces containing ResourceQuota objects
+
 # 2.0.0-alpha8
 
 ## New enhancements
@@ -40,7 +74,7 @@
 
 ### API Change
 - New API to upload relationships (`ExperimentRestAPI.api_relationship_push()`) - see our documentation for [runtime support for surrogates](https://st4sd.github.com/overview/using-graph-relationships) documentation for more.
-- Updated the API to start an experiment so that users can also request to use a runtime policy. For more information see our documentation [running virtual experiments on OpenShift](https://st4sd.github.com/overview/running-workflows-on-openshift)) and configuring [runtime policies](https://st4sd.github.com/overview/using-runtime-policies).
+- Updated the API to start an experiment so that users can also request to use a runtime policy. For more information see our documentation [running virtual experiments on OpenShift](https://st4sd.github.com/overview/running-workflows-on-openshift) and configuring [runtime policies](https://st4sd.github.com/overview/using-runtime-policies).
 
 ### Bugs and regressions
 - Miscellaneous optimisations in error reporting

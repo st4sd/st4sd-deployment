@@ -11,6 +11,6 @@ description: |
    and High Performance Computing (HPC) platforms. See https://st4sd.github.io/overview for more information.
 type: application
 
-version: "0.10.3"
+version: "0.11.0"
 
 appVersion: "2.0.0-alpha13"

@@ -75,3 +75,43 @@ prefixing it with "${user-prefix}-${namespace}." */}}
 {{- $text := $quoted | join "," }}
 {{- printf $text }}
 {{- end }}
+
+
+{{/*Decides the value of the field gitsecret-oauth in the st4sd-runtime-config secret
+
+If .Values.installGithubSecretOAuth is set, then it echoes that name
+It attempts to peek at the existing st4sd-runtime-service ConfigMap.
+    If it does not exist, it returns null
+    If the field config.json['gitsecret-oauth'] does not exist, it returns null
+    If the secret called config.json['gitsecret-oauth'] is unmanaged by helm, it returns null
+    At this point, we know that the ConfigMap points to a secret which is not managed by Helm.
+    We can infer that a ST4SD namespace-admin added it post installation and that they probably
+    want to keep using it. Therefore we just print its name so that the configmap can re-use it
+*/}}
+{{- define "secret.gitSecretOAuthName" }}
+{{- if .Values.installGithubSecretOAuth  }}
+    {{- print .Values.gitOAuthSecretName -}}
+{{- else }}
+    {{- $cm := lookup "v1" "ConfigMap" .Release.Namespace .Values.runtimeServiceConfigConfigMapName }}
+    {{- if $cm }}
+        {{- $data := $cm.data | default dict }}
+        {{- $config := get $data "config.json" | default "null" | fromJson }}
+        {{- if $config }}
+            {{- $secret_name := get $config "gitsecret-oauth" }}
+            {{- if $secret_name }}
+                {{- $secret := lookup "v1" "Secret" .Release.Namespace $secret_name }}
+                {{- if $secret }}
+                    {{- $label := get ($secret.metadata.labels | default dict) "app.kubernetes.io/managed-by" }}
+                    {{- if ne $label "Helm" -}}
+                        {{- /*VV: The ConfigMap points to a secret which is NOT managed by helm 
+                        this means that a ST4SD-namespace admin added the secret post-installation.
+                        Re-use the secret. If Helm managed the secret, then we should remove it 
+                        i.e. do not print its name.*/}}
+                        {{- print $secret_name -}}
+                    {{- end -}}
+                {{- end }}
+            {{- end}}
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
