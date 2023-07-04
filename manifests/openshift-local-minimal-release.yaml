@@ -207,15 +207,17 @@ data:
   # VV: st4sdRuntimeService.imagePullSecrets (in _helpers.tpl) concatenates those already defined in the
   # ConfigMap on the server to those defined by the helm chart. If you are using DEBUG=yes what you see below
   # does not include what's on the server. Helm will not contact the server when not actually deploying.
+  # Similary, secret.gitSecretOAuthName will re-use a secret that has been created post-installation if
+  # installGithubSecretOAuth is False (see tempalte comments in _helpers.tpl for more information).
   config.json: |-
     {
       "default-arguments": [{"--executionMode":"debug","--failSafeDelays":"no","--registerWorkflow":"y"}],
-      "workflow-monitoring-image": "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring:bundle-2.0.0-alpha7",
-      "image": "quay.io/st4sd/official-base/st4sd-runtime-core:bundle-2.0.0-alpha7",
+      "workflow-monitoring-image": "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring:bundle-2.0.0-alpha14",
+      "image": "quay.io/st4sd/official-base/st4sd-runtime-core:bundle-2.0.0-alpha14",
       "imagePullSecrets": [],
       "workingVolume": "workflow-instances-pvc",
       "inputdatadir": "./examples",
-      "s3-fetch-files-image": "quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3:bundle-2.0.0-alpha7"
+      "s3-fetch-files-image": "quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3:bundle-2.0.0-alpha14"
     }
 ---
 # Source: st4sd-workflow-stack/templates/cm-trusted-certificates-ca.yaml
@@ -767,7 +769,10 @@ spec:
     st4sd.ibm.com/component: authentication
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
@@ -787,7 +792,7 @@ spec:
         fsGroup: 0
       containers:
       - name: nginx
-        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         command:
           - /scripts/nginx-full.sh
@@ -910,7 +915,7 @@ spec:
        - nginx
        from:
          kind: ImageStreamTag
-         name: st4sd-datastore:bundle-2.0.0-alpha7
+         name: st4sd-datastore:bundle-2.0.0-alpha14
      type: ImageChange
   
    - type: ConfigChange
@@ -929,7 +934,10 @@ spec:
     app: st4sd-datastore-cloud-instance
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
@@ -975,7 +983,7 @@ spec:
           value: https://local.apps-crc.testing/ds-gateway
         - name: LOCAL_GATEWAY_ID
           value: local
-        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         resources: 
           limits:
@@ -998,7 +1006,7 @@ spec:
             value: "5002"
           - name: DS_FILE_MAX_SIZE
             value: "33554432"
-        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         resources: 
           limits:
@@ -1032,7 +1040,7 @@ spec:
       - gateway
       from:
         kind: ImageStreamTag
-        name: st4sd-datastore:bundle-2.0.0-alpha7
+        name: st4sd-datastore:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1052,7 +1060,10 @@ spec:
     name: st4sd-datastore-mongodb
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
     recreateParams: {}
     type: Recreate
   template:
@@ -1082,7 +1093,7 @@ spec:
               name: st4sd-datastore-mongodb-credentials
         - name: MONGODB_DATABASE
           value: admin
-        image: quay.io/st4sd/official-base/st4sd-datastore-mongodb:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore-mongodb:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         name: mongodb
         ports:
@@ -1118,7 +1129,7 @@ spec:
       - mongodb
       from:
         kind: ImageStreamTag
-        name: st4sd-datastore-mongodb:bundle-2.0.0-alpha7
+        name: st4sd-datastore-mongodb:bundle-2.0.0-alpha14
     type: ImageChange
 ---
 # Source: st4sd-workflow-stack/templates/dc-datastore-nexus.yaml
@@ -1135,7 +1146,10 @@ spec:
     app: st4sd-datastore-nexus
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
@@ -1175,7 +1189,7 @@ spec:
             value: admin
           - name: "EXTERNAL_PORT"
             value: "5000"
-        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         
         ports:
@@ -1196,7 +1210,7 @@ spec:
       - name: registry
         command:
           - /scripts/gateway_registry.sh
-        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         env:
           - name: FLASK_URL_PREFIX
@@ -1238,7 +1252,7 @@ spec:
       - registry
       from:
         kind: ImageStreamTag
-        name: st4sd-datastore:bundle-2.0.0-alpha7
+        name: st4sd-datastore:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1256,6 +1270,14 @@ spec:
   selector:
     app: st4sd-registry-backend
     st4sd.ibm.com/component: registry-backend
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    recreateParams: { }
+    type: Recreate
   template:
     metadata:
       labels:
@@ -1274,7 +1296,7 @@ spec:
         ports:
           - containerPort: 8085
                     
-        image: quay.io/st4sd/official-base/st4sd-registry-backend:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-registry-backend:bundle-2.0.0-alpha14
         imagePullPolicy: Always
 
         resources: 
@@ -1307,7 +1329,7 @@ spec:
       - registry-backend
       from:
         kind: ImageStreamTag
-        name: st4sd-registry-backend:bundle-2.0.0-alpha7
+        name: st4sd-registry-backend:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1325,6 +1347,14 @@ spec:
   selector:
     app: st4sd-registry-ui
     st4sd.ibm.com/component: registry-ui
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    recreateParams: { }
+    type: Recreate
   template:
     metadata:
       labels:
@@ -1340,7 +1370,7 @@ spec:
         ports:
           - containerPort: 8080
                     
-        image: quay.io/st4sd/official-base/st4sd-registry-ui:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-registry-ui:bundle-2.0.0-alpha14
         imagePullPolicy: Always
 
         resources: 
@@ -1373,7 +1403,7 @@ spec:
       - registry-ui
       from:
         kind: ImageStreamTag
-        name: st4sd-registry-ui:bundle-2.0.0-alpha7
+        name: st4sd-registry-ui:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1394,7 +1424,10 @@ spec:
     st4sd.ibm.com/component: workflow-operator
   strategy:
     activeDeadlineSeconds: 21600
-    resources: {}
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
@@ -1436,16 +1469,16 @@ spec:
         - name: GIT_SYNC_IMAGE
           value: k8s.gcr.io/git-sync/git-sync:v3.6.1
         - name: WORKFLOW_MONITORING_IMAGE
-          value: quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring:bundle-2.0.0-alpha7
+          value: quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring:bundle-2.0.0-alpha14
         - name: S3_FETCH_FILES_IMAGE
-          value: quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3:bundle-2.0.0-alpha7
+          value: quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3:bundle-2.0.0-alpha14
         - name: USER_ID
           value: "1000140001"
         - name: GROUP_ID
           value: "0"
         - name: FSGROUP
           value: "5000"
-        image: quay.io/st4sd/official-base/st4sd-runtime-k8s:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-runtime-k8s:bundle-2.0.0-alpha14
         imagePullPolicy: Always
         name: workflow-operator
         terminationMessagePath: /dev/termination-log
@@ -1482,7 +1515,7 @@ spec:
       - workflow-operator
       from:
         kind: ImageStreamTag
-        name: st4sd-runtime-k8s:bundle-2.0.0-alpha7
+        name: st4sd-runtime-k8s:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1500,6 +1533,19 @@ spec:
   selector:
     app: st4sd-runtime-service
     st4sd.ibm.com/component: runtime-service
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: 
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
   template:
     metadata:
       labels:
@@ -1536,7 +1582,7 @@ spec:
             containerPort: 4000
             protocol: TCP
         
-        image: quay.io/st4sd/official-base/st4sd-runtime-service:bundle-2.0.0-alpha7
+        image: quay.io/st4sd/official-base/st4sd-runtime-service:bundle-2.0.0-alpha14
         imagePullPolicy: Always
 
         resources: 
@@ -1578,7 +1624,7 @@ spec:
       - runtime-service
       from:
         kind: ImageStreamTag
-        name: st4sd-runtime-service:bundle-2.0.0-alpha7
+        name: st4sd-runtime-service:bundle-2.0.0-alpha14
     type: ImageChange
   
   - type: ConfigChange
@@ -1597,9 +1643,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-datastore-mongodb:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-datastore-mongodb:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -1618,9 +1664,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-datastore:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -1639,9 +1685,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-registry-backend:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-registry-backend:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -1660,9 +1706,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-registry-ui:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-registry-ui:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -1681,9 +1727,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-runtime-service:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-runtime-service:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -1702,9 +1748,9 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/st4sd/official-base/st4sd-runtime-k8s:bundle-2.0.0-alpha7
+      name: quay.io/st4sd/official-base/st4sd-runtime-k8s:bundle-2.0.0-alpha14
     importPolicy: {}
-    name: :bundle-2.0.0-alpha7
+    name: :bundle-2.0.0-alpha14
     reference: true
     referencePolicy:
       type: Source
@@ -6979,7 +7025,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-runtime-core"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -6996,7 +7042,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-runtime-service"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7013,7 +7059,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-runtime-k8s"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7030,7 +7076,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7047,7 +7093,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7064,7 +7110,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-registry-ui"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7081,7 +7127,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-registry-backend"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7098,7 +7144,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-datastore"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
@@ -7115,7 +7161,7 @@ spec:
         kind: DockerImage
         name: "quay.io/st4sd/official-base/st4sd-datastore-mongodb"
       to:
-        name: "bundle-2.0.0-alpha7"
+        name: "bundle-2.0.0-alpha14"
       referencePolicy:
         type: ""
 status: {}
