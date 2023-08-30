@@ -1,3 +1,13 @@
+# 2.0.0
+
+## Registry UI improvements
+- Introduce View Canvas for viewing experiment graphs.
+- [BETA] Introduce Edit Canvas for applying transformations to experiments.
+
+## Bugs and regressions
+
+- Miscellaneous fixes
+
 # 2.0.0-alpha14
 
 ## Runtime Service improvements
