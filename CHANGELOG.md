@@ -1,3 +1,9 @@
+# 2.0.1
+
+## Bugs and regressions
+
+- Disable "View runs" link on ST4SD Registry for global instances
+
 # 2.0.0
 
 ## Registry UI improvements
