@@ -94,7 +94,7 @@ imagesRegistryBackend: "quay.io/st4sd/official-base/st4sd-registry-backend"
 imagesRegistryUI: "quay.io/st4sd/official-base/st4sd-registry-ui"
 
 # git-sync is an external image (https://github.com/kubernetes/git-sync) - it does not need an `imagesVariant`
-imagesRuntimeGitSync: "k8s.gcr.io/git-sync/git-sync:v3.6.1"
+imagesRuntimeGitSync: "registry.k8s.io/git-sync/git-sync:v3.6.1"
 
 # imageStreamTags are referenced by templates in the same way as `images` above
 # example: {{ .Values.imageStreamTagRuntimeOperator }}{{ .Values.imagesVariant }}
