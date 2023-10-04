@@ -871,7 +871,7 @@ spec:
           #     not the case for OpenShift 3.11. To maintain backwards compatibility we can only attempt to
           #     use a CA bundle IFF the CA file /etc/tls/openshift-certificate/ca-bundle.crt exists
         # VV: More recent versions require permissions to read objects (e.g ConfigMaps) in system namespaces
-        image: quay.io/openshift/origin-oauth-proxy:4.6.0
+        image: quay.io/openshift/origin-oauth-proxy:4.14
         imagePullPolicy: Always
         ports:
           - name: oauth-proxy
