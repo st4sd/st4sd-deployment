@@ -10,7 +10,7 @@
 #  S3_ACCESS_KEY_ID (optional - if s3 bucket is writable by all)
 #  S3_SECRET_ACCESS_KEY (optional - if s3 bucket is writable by all)
 #  S3_REGION (optional)
-# When secretNameS3Library is set the st4sd-runtime-service will use the described S3 bucket
+# When secretNameS3GraphLibrary is set the st4sd-runtime-service will use the described S3 bucket
 # to store experiments in DSL 2.0 format that the st4sd-registry-ui WebCanvas will create
 secretNameS3InternalExperiments: null
 
@@ -20,9 +20,9 @@ secretNameS3InternalExperiments: null
 #  S3_ACCESS_KEY_ID (optional - if s3 bucket is writable by all)
 #  S3_SECRET_ACCESS_KEY (optional - if s3 bucket is writable by all)
 #  S3_REGION (optional)
-# When secretNameS3Library is set the st4sd-runtime-service will use the described S3 bucket
+# When secretNameS3GraphLibrary is set the st4sd-runtime-service will use the described S3 bucket
 # to store Graph templates in DSL 2.0 format
-secretNameS3Library: null
+secretNameS3GraphLibrary: null
 
 installGithubSecretOAuth: false
 # IF above is true, also provide an gitOAuthToken value

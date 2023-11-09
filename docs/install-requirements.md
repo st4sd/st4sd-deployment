@@ -233,7 +233,7 @@ Include the following fields:
 - S3_SECRET_ACCESS_KEY (optional - if s3 bucket is writable by all)
 - S3_REGION (optional)
 
-Then set the value `secretNameS3Library` to the name of the kubernetes secret.
+Then set the value `secretNameS3GraphLibrary` to the name of the kubernetes secret.
 
 ## Putting it all together
 

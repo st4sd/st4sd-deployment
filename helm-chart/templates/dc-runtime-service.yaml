@@ -48,8 +48,8 @@ spec:
         - name: S3_INTERNAL_EXPERIMENTS_NAME
           value: "{{ . }}"
         {{ end }}
-        {{ with .Values.secretNameS3Library }}
-        - name: S3_LIBRARY_SECRET_NAME
+        {{ with .Values.secretNameS3GraphLibrary }}
+        - name: S3_GRAPH_LIBRARY_SECRET_NAME
           value: "{{ . }}"
         {{ end }}
         # VV: Uses in-cluster DNS resolution for services - below is the name of the nexus service
