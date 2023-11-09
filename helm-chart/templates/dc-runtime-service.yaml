@@ -44,6 +44,14 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
+        {{ with .Values.secretNameS3InternalExperiments }}
+        - name: S3_INTERNAL_EXPERIMENTS_NAME
+          value: "{{ . }}"
+        {{ end }}
+        {{ with .Values.secretNameS3Library }}
+        - name: S3_LIBRARY_SECRET_NAME
+          value: "{{ . }}"
+        {{ end }}
         # VV: Uses in-cluster DNS resolution for services - below is the name of the nexus service
         # and the port number is the service-port endpoint for the "mongodb-proxy" port
         - name: DATASTORE_MONGODB_PROXY_ENDPOINT

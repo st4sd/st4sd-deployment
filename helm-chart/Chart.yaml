@@ -5,12 +5,12 @@
 #  Alessandro Pomponio
 
 apiVersion: v2
-name: st4sd-workflow-stack
+name: st4sd-cloud
 description: |
    The Simulation toolkit for Scientific discovery (ST4SD) supports executing virtual experiments on Kubernetes 
    and High Performance Computing (HPC) platforms. See https://st4sd.github.io/overview for more information.
 type: application
 
-version: "0.11.0"
+version: "0.12.0"
 
 appVersion: "2.1.0"

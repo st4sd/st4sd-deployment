@@ -205,6 +205,35 @@ Archived objects are persisted under `$INSTANCE_DIR/stages/stage<index>/<compone
 
 **Note**: See [`elaunch.py`](https://github.com/st4sd/st4sd-runtime-core/blob/master/scripts/elaunch.py) for the full list of the command-line arguments to the ST4SD runtime.
 
+## Optional Internal Experiments storage
+
+The st4sd-runtime-service has support for storing DSL 2.0 experiments in its internal storage which is hosted on a S3 bucket.
+To enable the Internal Experiments storage create a kubernetes secret in the same namespace as your ST4SD deployment.
+
+Include the following fields:
+
+- S3_ENDPOINT
+- S3_BUCKET
+- S3_ACCESS_KEY_ID (optional - if s3 bucket is writable by all)
+- S3_SECRET_ACCESS_KEY (optional - if s3 bucket is writable by all)
+- S3_REGION (optional)
+
+Then set the value `secretNameS3InternalExperiments` to the name of the kubernetes secret.
+
+## Optional Graph Library storage
+
+The st4sd-runtime-service has support for storing re-usable DSL 2.0 graph templates in its Graph Library which is hosted on a S3 bucket.
+To enable the Graph Library storage create a kubernetes secret in the same namespace as your ST4SD deployment.
+
+Include the following fields:
+
+- S3_ENDPOINT
+- S3_BUCKET
+- S3_ACCESS_KEY_ID (optional - if s3 bucket is writable by all)
+- S3_SECRET_ACCESS_KEY (optional - if s3 bucket is writable by all)
+- S3_REGION (optional)
+
+Then set the value `secretNameS3Library` to the name of the kubernetes secret.
 
 ## Putting it all together
 
