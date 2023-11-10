@@ -85,10 +85,13 @@ installAuthentication: true
 installRegistryBackend: true
 installRegistryUI: true
 
-# Changes the values for the backend configmap depending on
-# whether this is a "global registry" deployment or not.
-# This will change the UI's behaviour.
+# Changes the values for the backend configmap.
+# These toggles enable or disable feature gates.
 isGlobalRegistry: false
+backendEnableBuildCanvas: false
+backendEnableEditParameterisation: false
+backendEnableRunExperiment: false
+backendEnableCanvas: true
 
 # When set to true DeploymentConfig objects use imageStreamTags
 # which means that after deploying this helm-chart you need to run `oc import-image`

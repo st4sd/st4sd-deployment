@@ -8,4 +8,9 @@ metadata:
     st4sd.ibm.com/component: registry-backend
 data:
   ST4SD_REGISTRY_UI_SETTINGS_IS_GLOBAL: {{ if .Values.isGlobalRegistry }}"yes"{{ else }}"no"{{ end }}
+  ST4SD_REGISTRY_UI_SETTINGS_ENABLE_BUILD_CANVAS: {{ if .Values.backendEnableBuildCanvas }}"yes"{{ else }}"no"{{ end }}
+  ST4SD_REGISTRY_UI_SETTINGS_ENABLE_EDIT_PARAMETERISATION: {{ if .Values.backendEnableEditParameterisation }}"yes"{{ else }}"no"{{ end }}
+  ST4SD_REGISTRY_UI_SETTINGS_ENABLE_RUN_EXPERIMENT: {{ if .Values.backendEnableRunExperiment }}"yes"{{ else }}"no"{{ end }}
+  # VV: Notice that this env-var is DISABLING a feature rather than enabling it
+  ST4SD_REGISTRY_UI_SETTINGS_DISABLE_CANVAS: {{ if .Values.backendEnableCanvas }}"no"{{ else }}"yes"{{ end }}
 {{ end }}

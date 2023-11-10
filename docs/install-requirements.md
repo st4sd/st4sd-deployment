@@ -205,6 +205,28 @@ Archived objects are persisted under `$INSTANCE_DIR/stages/stage<index>/<compone
 
 **Note**: See [`elaunch.py`](https://github.com/st4sd/st4sd-runtime-core/blob/master/scripts/elaunch.py) for the full list of the command-line arguments to the ST4SD runtime.
 
+## Registry backend feature gates
+
+The st4sd-registry-backend provides feature gates for administrator to disable or enable functionalities on the st4sd-registry-ui.
+
+### The isGlobalRegistry toggle
+
+If you are planning to expose your st4sd-registry-ui deployment publicly, set the value of `isGlobalRegistry` to `true` . This will disable features such as viewing experiment runs to reduce security concerns.
+
+### Disabling features
+
+Some feature gates are on by default. These settings typically involve giving read-only access to data.
+
+- Set `backendEnableCanvas` to `false` to prevent users from looking at the graph representation of virtual experiments.
+
+### Enabling features
+
+These settings typically involve giving users the ability to create, modify, or run experiments. As such, they are off by default.
+
+- Set `backendEnableBuildCanvas` to `true` to give users the ability to create virtual experiments from scratch through the Registry UI.
+- Set `backendEnableEditParameterisation` to `true` to give users the ability to modify the parameterisation of virtual experiments directly from the Registry UI.
+- Set `backendEnableRunExperiment` to `true` to give users the ability to run virtual experiments directly from the Registry UI.
+
 ## Optional Internal Experiments storage
 
 The st4sd-runtime-service has support for storing DSL 2.0 experiments in its internal storage which is hosted on a S3 bucket.
