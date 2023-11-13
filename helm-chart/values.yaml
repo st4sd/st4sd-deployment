@@ -90,6 +90,7 @@ installRegistryUI: true
 isGlobalRegistry: false
 backendEnableBuildCanvas: false
 backendEnableEditParameterisation: false
+backendEnableEditExperiment: false
 backendEnableRunExperiment: false
 backendEnableCanvas: true
 
