@@ -92,6 +92,7 @@ backendEnableBuildCanvas: false
 backendEnableEditParameterisation: false
 backendEnableEditExperiment: false
 backendEnableRunExperiment: false
+backendEnableLocalGraphLibraryWriteAccess: false
 backendEnableCanvas: true
 
 # When set to true DeploymentConfig objects use imageStreamTags

@@ -227,6 +227,7 @@ These settings typically involve giving users the ability to create, modify, or 
 - Set `backendEnableEditParameterisation` to `true` to give users the ability to modify the parameterisation of virtual experiments directly from the Registry UI.
 - Set `backendEnableEditExperiment` to `true` to give users the ability to modify pre-existing virtual experiments directly from the web UI. **NOTE:** requires `backendEnableBuildCanvas` and `backendEnableEditParameterisation` to both be `true`.
 - Set `backendEnableRunExperiment` to `true` to give users the ability to run virtual experiments directly from the Registry UI.
+- Set `backendEnableLocalGraphLibraryWriteAccess` to `true` to give users the ability to add experiments to the graphs library. **NOTE:** requires `backendEnableBuildCanvas` to also be `true`.
 
 ## Optional Internal Experiments storage
 

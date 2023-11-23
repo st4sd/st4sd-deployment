@@ -12,6 +12,7 @@ data:
   ST4SD_REGISTRY_UI_SETTINGS_ENABLE_EDIT_PARAMETERISATION: {{ if .Values.backendEnableEditParameterisation }}"yes"{{ else }}"no"{{ end }}
   ST4SD_REGISTRY_UI_SETTINGS_ENABLE_BUILD_CANVAS_EDITING: {{ if .Values.backendEnableEditExperiment }}"yes"{{ else }}"no"{{ end }}
   ST4SD_REGISTRY_UI_SETTINGS_ENABLE_RUN_EXPERIMENT: {{ if .Values.backendEnableRunExperiment }}"yes"{{ else }}"no"{{ end }}
+  ST4SD_REGISTRY_UI_SETTINGS_ENABLE_LOCAL_GRAPHS_LIBRARY_WRITE_ACCESS: {{ if .Values.backendEnableLocalGraphLibraryWriteAccess }}"yes"{{ else }}"no"{{ end }}
   # VV: Notice that this env-var is DISABLING a feature rather than enabling it
   ST4SD_REGISTRY_UI_SETTINGS_DISABLE_CANVAS: {{ if .Values.backendEnableCanvas }}"no"{{ else }}"yes"{{ end }}
 {{ end }}
