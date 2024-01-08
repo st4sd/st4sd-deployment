@@ -1,3 +1,21 @@
+# 2.1.1
+
+## Fixes
+
+- Verify the contents of Secrets containing S3 credentials for Internal Experiments (i.e. Build Canvas feature) and the Graph Library 
+
+# 2.1.0 
+
+## Registry UI improvements
+
+- Support building experiments using an interactive Build Canvas
+  - Experiments created this way can also be Edited using the same Build Canvas
+- Support for a Graph Library containing reusable Graph recipes
+
+## New enhancements
+
+- (Beta) Support for Experiment Domain Specific Language 2.0 (DSL 2.0)
+
 # 2.0.1
 
 ## Bugs and regressions
@@ -8,7 +26,7 @@
 
 ## Registry UI improvements
 - Introduce View Canvas for viewing experiment graphs.
-- [BETA] Introduce Edit Canvas for applying transformations to experiments.
+- (BETA) Introduce Edit Canvas for applying transformations to experiments.
 
 ## Bugs and regressions
 

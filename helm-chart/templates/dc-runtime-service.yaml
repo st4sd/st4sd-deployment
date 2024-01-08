@@ -45,7 +45,7 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         {{ with .Values.secretNameS3InternalExperiments }}
-        - name: S3_INTERNAL_EXPERIMENTS_NAME
+        - name: S3_INTERNAL_EXPERIMENTS_SECRET_NAME
           value: "{{ . }}"
         {{ end }}
         {{ with .Values.secretNameS3GraphLibrary }}
