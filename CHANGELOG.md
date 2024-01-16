@@ -1,3 +1,14 @@
+# 2.1.2
+
+## Fixes
+
+- Fixed bug in light validation of DSL 2.0 which would be triggered when the validated graphs contained templates for which some parameters were unset
+- Fixed miscellaneous bugs in st4sd-registry-ui (most important are firefox compatibility and modals responsiveness)
+
+## New enhancements
+
+- Improved light validation of DSL 2.0 helps catch more errors in Graphs before they are admitted into the Graph Library
+
 # 2.1.1
 
 ## Fixes
