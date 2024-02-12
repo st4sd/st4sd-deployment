@@ -1,3 +1,10 @@
+# 2.2.0
+
+## Features
+
+- Registry UI now supports plotting histograms of properties
+
+
 # 2.1.2
 
 ## Fixes
