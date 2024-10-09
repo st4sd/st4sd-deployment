@@ -1,3 +1,15 @@
+# 2.3.0
+
+## Features
+
+- Implemented Key-Outputs and Interface for DSL 2.0 workflows
+- Support setting the source to an application-dependency to a directory that's present in the Git repository of the workflow
+
+## New enhancements
+
+- Improved validation of DSL 2.0 for command-line tools as well as the Build Canvas page of ST4SD Registry UI
+- Miscellaneous optimizations to the ST4SD registry UI
+
 # 2.2.0
 
 ## Features
