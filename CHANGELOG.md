@@ -1,3 +1,10 @@
+# 2.4.0
+
+## Features
+
+- Complete rework of Run Experiment functionality on the ST4SD Registry UI. The functionality is now on by default.
+- Minor changes and fixes to enable above functionalities.
+
 # 2.3.0
 
 ## Features

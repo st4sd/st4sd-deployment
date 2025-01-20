@@ -91,7 +91,7 @@ isGlobalRegistry: false
 backendEnableBuildCanvas: false
 backendEnableEditParameterisation: false
 backendEnableEditExperiment: false
-backendEnableRunExperiment: false
+backendEnableRunExperiment: true
 backendEnableLocalGraphLibraryWriteAccess: false
 backendEnableCanvas: true
 
