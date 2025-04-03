@@ -1,3 +1,18 @@
+# 2.5.0
+
+## Features
+
+- Updates to the Run Experiment panel on ST4SD Registry UI
+  - Support input and data files located on a PersistentVolumeClaim (PVC) or datashim Dataset
+
+## Fixes
+
+- Updates to the validation logic as well as miscellaneous fixes for DSL 2.0
+
+## Updates
+
+- Updated mongodb to v6.0
+
 # 2.4.0
 
 ## Features
