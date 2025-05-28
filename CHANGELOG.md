@@ -1,3 +1,9 @@
+# 2.5.1
+
+## Fixes
+
+- During the execution of an experiment via the st4sd-runtime-service, deduplicate input/data volumes which have different identifiers but identical configuration otherwise
+
 # 2.5.0
 
 ## Features
