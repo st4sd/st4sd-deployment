@@ -1,3 +1,9 @@
+# 2.5.2
+
+## Fixes
+
+- Fix the script that instantiates the MongoDB database for ST4SD Datastore
+
 # 2.5.1
 
 ## Fixes
