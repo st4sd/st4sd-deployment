@@ -1,3 +1,11 @@
+# 2.5.3
+
+# Maintenance
+
+- Applied security patches to ST4SD container images
+- Upgrade MongoDB databases to with `setFeatureCompatibilityVersion 6.0`
+- Upgraded `quay.io/openshift/origin-oauth-proxy` image to `4.20`
+
 # 2.5.2
 
 ## Fixes

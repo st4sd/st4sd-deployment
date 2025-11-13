@@ -109,8 +109,7 @@ spec:
           # VV: OpenShift 4 supports injecting trusted CA certificates to ConfigMaps, but that's
           #     not the case for OpenShift 3.11. To maintain backwards compatibility we can only attempt to
           #     use a CA bundle IFF the CA file /etc/tls/openshift-certificate/ca-bundle.crt exists
-        # VV: More recent versions require permissions to read objects (e.g ConfigMaps) in system namespaces
-        image: quay.io/openshift/origin-oauth-proxy:4.14
+        image: {{ .Values.imageOriginOAuthProxy }}
         imagePullPolicy: Always
         ports:
           - name: oauth-proxy

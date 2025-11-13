@@ -108,6 +108,7 @@ pvcForRuntimeServiceMetadata: runtime-service
 #  {{ .Values.image<image> }}{{ .Values.imagesVariant }}
 
 imagesVariant: ":platform-release-latest"
+imageOriginOAuthProxy: "quay.io/openshift/origin-oauth-proxy:42.0"
 imagesRuntimeCore: "quay.io/st4sd/official-base/st4sd-runtime-core"
 imagesDatastoreMongoDB: "quay.io/st4sd/official-base/st4sd-datastore-mongodb"
 imagesRuntimeMonitoring: "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring"
