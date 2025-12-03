@@ -1,3 +1,10 @@
+# 2.5.4
+
+# Maintenance
+
+- Upgraded st4sd-runtime-k8s to go v1.25
+- Upgraded st4sd-olm to go v1.25
+
 # 2.5.3
 
 # Maintenance
