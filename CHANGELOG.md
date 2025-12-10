@@ -2,7 +2,7 @@
 
 ## Maintenance
 
-- Upgrade MongoDB databases to v6.7 with `setFeatureCompatibilityVersion 7.0`
+- Upgrade MongoDB databases to v7 with `setFeatureCompatibilityVersion 7.0`
 
 # 2.5.4
 
