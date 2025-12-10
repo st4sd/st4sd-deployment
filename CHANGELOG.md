@@ -1,16 +1,22 @@
+# 2.5.5
+
+## Maintenance
+
+- Upgrade MongoDB databases to v7 with `setFeatureCompatibilityVersion 7.0`
+
 # 2.5.4
 
-# Maintenance
+## Maintenance
 
 - Upgraded st4sd-runtime-k8s to go v1.25
 - Upgraded st4sd-olm to go v1.25
 
 # 2.5.3
 
-# Maintenance
+## Maintenance
 
 - Applied security patches to ST4SD container images
-- Upgrade MongoDB databases to with `setFeatureCompatibilityVersion 6.0`
+- Upgrade MongoDB databases to v6.0 with `setFeatureCompatibilityVersion 6.0`
 - Upgraded `quay.io/openshift/origin-oauth-proxy` image to `4.20`
 
 # 2.5.2
