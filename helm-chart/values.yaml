@@ -112,8 +112,6 @@ imagesVariant: ":platform-release-latest"
 imageOriginOAuthProxy: "quay.io/openshift/origin-oauth-proxy:4.20"
 imagesRuntimeCore: "quay.io/st4sd/official-base/st4sd-runtime-core"
 imagesDatastoreMongoDB: "quay.io/st4sd/official-base/st4sd-datastore-mongodb"
-imagesRuntimeMonitoring: "quay.io/st4sd/official-base/st4sd-runtime-k8s-monitoring"
-imagesRuntimeS3Fetch: "quay.io/st4sd/official-base/st4sd-runtime-k8s-input-s3"
 imagesRuntimeOperator: "quay.io/st4sd/official-base/st4sd-runtime-k8s"
 imagesRuntimeService: "quay.io/st4sd/official-base/st4sd-runtime-service"
 imagesDatastore: "quay.io/st4sd/official-base/st4sd-datastore"
@@ -155,7 +153,7 @@ datastoreMongoDBRelativePath: mongodb
 datastoreMongoDBSecretName: st4sd-datastore-mongodb-credentials
 
 # Rest of values used to populate the st4sd-runtime-service ConfigMap
-# + imagesRuntimeCore, imagesRuntimeMonitoring, imagesS3Fetch
+# + imagesRuntimeCore
 
 # if installDatastore is set to true, this helm chart will
 # create the route ${datastoreLabelGateway}-{namespace}.${clusterRouteDomain}

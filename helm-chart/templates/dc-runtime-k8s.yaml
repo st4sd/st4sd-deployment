@@ -56,9 +56,9 @@ spec:
         - name: GIT_SYNC_IMAGE
           value: {{ .Values.imagesRuntimeGitSync }}
         - name: WORKFLOW_MONITORING_IMAGE
-          value: {{ .Values.imagesRuntimeMonitoring }}{{ .Values.imagesVariant }}
+          value: {{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}
         - name: S3_FETCH_FILES_IMAGE
-          value: {{ .Values.imagesRuntimeS3Fetch }}{{ .Values.imagesVariant }}
+          value: {{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}
         - name: USER_ID
           value: {{ int64 .Values.workflowContainersUid | quote }}
         - name: GROUP_ID
