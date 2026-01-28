@@ -163,8 +163,6 @@ EOF
     cat <<EOF
 imagesRuntimeCore: $(rewrite_url st4sd-runtime-core ${reg_prefix})
 imagesDatastoreMongoDB: $(rewrite_url st4sd-datastore-mongodb ${reg_prefix})
-imagesRuntimeMonitoring: $(rewrite_url st4sd-runtime-k8s-monitoring ${reg_prefix})
-imagesRuntimeS3Fetch: $(rewrite_url st4sd-runtime-k8s-input-s3 ${reg_prefix})
 imagesRuntimeOperator: $(rewrite_url st4sd-runtime-k8s ${reg_prefix})
 imagesRuntimeService: $(rewrite_url st4sd-runtime-service ${reg_prefix})
 imagesDatastore: $(rewrite_url st4sd-datastore ${reg_prefix})
@@ -177,8 +175,6 @@ EOF
     cat <<EOF
 imagesRuntimeCore: ${public_base_images}/st4sd-runtime-core
 imagesDatastoreMongoDB: ${public_base_images}/st4sd-datastore-mongodb
-imagesRuntimeMonitoring: ${public_base_images}/st4sd-runtime-k8s-monitoring
-imagesRuntimeS3Fetch: ${public_base_images}/st4sd-runtime-k8s-input-s3
 imagesRuntimeOperator: ${public_base_images}/st4sd-runtime-k8s
 imagesRuntimeService: ${public_base_images}/st4sd-runtime-service
 imagesDatastore: ${public_base_images}/st4sd-datastore

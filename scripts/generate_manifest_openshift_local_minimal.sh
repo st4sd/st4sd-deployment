@@ -61,8 +61,6 @@ namespaceContainersFsGroupCommon: 0
 
 imagesRuntimeCore: ${st4sd_registry_url}/st4sd-runtime-core
 imagesDatastoreMongoDB: ${st4sd_registry_url}/st4sd-datastore-mongodb
-imagesRuntimeMonitoring: ${st4sd_registry_url}/st4sd-runtime-k8s-monitoring
-imagesRuntimeS3Fetch: ${st4sd_registry_url}/st4sd-runtime-k8s-input-s3
 imagesRuntimeOperator: ${st4sd_registry_url}/st4sd-runtime-k8s
 imagesRuntimeService: ${st4sd_registry_url}/st4sd-runtime-service
 imagesDatastore: ${st4sd_registry_url}/st4sd-datastore

@@ -1,3 +1,18 @@
+# 2.6.0
+
+## Features
+
+- Add support for python 3.12
+- Add support for Kubernetes v1.33
+
+## Breaking changes
+
+- Deprecate st4sd-runtime-k8s-s3 and st4sd-runtime-k8s-monitoring. This functionality is now part of st4s-runtime-core
+
+## Maintenance
+
+- Update all images
+
 # 2.5.5
 
 ## Maintenance

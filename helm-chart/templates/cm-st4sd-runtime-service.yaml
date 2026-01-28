@@ -28,12 +28,12 @@ data:
     {{- if .Values.defaultOrchestratorArguments }}
       "default-arguments": {{ .Values.defaultOrchestratorArguments | toJson }},
     {{- end }}
-      "workflow-monitoring-image": "{{ .Values.imagesRuntimeMonitoring }}{{ .Values.imagesVariant }}",
+      "workflow-monitoring-image": "{{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}",
       "image": "{{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}",
       "imagePullSecrets": [{{- include "st4sdRuntimeService.imagePullSecrets" . }}],
       "workingVolume": "{{ .Values.pvcForWorkflowInstances }}",
       "inputdatadir": "./examples",
-      "s3-fetch-files-image": "{{ .Values.imagesRuntimeS3Fetch }}{{ .Values.imagesVariant }}"
+      "s3-fetch-files-image": "{{ .Values.imagesRuntimeCore }}{{ .Values.imagesVariant }}"
     }
 
 {{ end }}

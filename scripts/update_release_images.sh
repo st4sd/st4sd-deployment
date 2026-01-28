@@ -37,7 +37,7 @@ export TAG_DESTINATION=${TAG_DESTINATION:-platform-release-latest}
 images=(
   "st4sd-runtime-core"
   "st4sd-runtime-service"
-  "st4sd-runtime-k8s" "st4sd-runtime-k8s-input-s3" "st4sd-runtime-k8s-monitoring"
+  "st4sd-runtime-k8s"
   "st4sd-datastore" "st4sd-datastore-mongodb"
   "st4sd-registry-ui" "st4sd-registry-backend"
 )
