@@ -84,6 +84,7 @@ installRuntimeService: true
 installAuthentication: true
 installRegistryBackend: true
 installRegistryUI: true
+installRuntimeK8s: true
 
 # Changes the values for the backend configmap.
 # These toggles enable or disable feature gates.
